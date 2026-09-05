@@ -270,39 +270,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fab__btn--play.is-playing svg{animation:spin 5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.sheet{position:fixed;inset:0;z-index:95;display:none}
-.sheet.is-open{display:block}
-.sheet__bg{position:absolute;inset:0;background:rgba(30,10,15,.55)}
-.sheet__panel{
-  position:absolute;left:50%;bottom:0;transform:translate(-50%,100%);
-  width:100%;max-width:var(--app);background:var(--paper);
-  padding:26px var(--edge) calc(26px + env(safe-area-inset-bottom));
-  border-top:2px solid var(--gold);
-  transition:transform .38s cubic-bezier(.3,0,.2,1);
-  max-height:82vh;overflow-y:auto;
-}
-.sheet.is-open .sheet__panel{transform:translate(-50%,0)}
-.sheet__h{font-family:var(--f-display);font-size:25px;color:var(--claret);margin:0 0 2px}
-.sheet__p{font-size:15px;color:var(--ink-soft);margin:0 0 20px}
-.track{
-  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
-  padding:12px 14px;margin-bottom:8px;background:var(--paper-2);
-  border:1px solid transparent;border-radius:2px;transition:border-color .25s ease
-}
-.track.is-active{border-color:var(--gold);background:#fff}
-.track__i{width:8px;height:8px;border-radius:50%;background:rgba(168,135,63,.35);flex:none}
-.track.is-active .track__i{background:var(--gold)}
-.track__t{font-size:16px;line-height:1.3}
-.track__s{display:block;font-family:var(--f-util);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
-.sheet__lbl{font-family:var(--f-util);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:22px 0 9px}
-.row{display:flex;gap:8px}
-.row input{flex:1}
-.row .btn{padding:12px 18px;white-space:nowrap}
-.vol{width:100%;accent-color:var(--claret)}
-.file-btn{
-  display:block;width:100%;text-align:center;padding:13px;border:1px dashed rgba(168,135,63,.6);
-  font-family:var(--f-util);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--claret)
-}
+.ph .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#0C1712}
+
 .hint{font-size:14px;color:var(--ink-soft);margin:8px 0 0;line-height:1.6}
 
 /* ---------- REVEAL (ringan: opacity + transform saja) ---------- */
@@ -574,8 +543,11 @@ button{font:inherit;color:inherit;cursor:pointer}
       </figure>
 
       <figure class="ph gal__wide rv" style="--ar:16/9">
-        <!-- <img src="foto/prewed-06.jpg" alt="Prewedding 6" loading="lazy"> -->
-        <figcaption class="ph__tag"><b>1920 × 1080 px</b><small>Lanskap · 16:9</small></figcaption>
+        <video id="galeriVideo" class="vid" controls playsinline preload="metadata"
+               poster="foto/video-poster.jpg">
+          <source src="video/prewedding.mp4" type="video/mp4">
+        </video>
+        <figcaption class="ph__tag"><b>Video 1920 × 1080 px</b><small>MP4 H.264 · maks 30 MB</small></figcaption>
       </figure>
     </div>
   </section>
@@ -650,41 +622,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <!-- =================== KONTROL MUSIK =================== -->
 <div class="fab" id="fab" hidden>
-  <button class="fab__btn" id="musicSettings" type="button" aria-label="Ganti musik latar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 3v13"/><path d="M12 6l7-2v13"/><circle cx="9" cy="17" r="3"/><circle cx="16" cy="15" r="3"/></svg>
-  </button>
   <button class="fab__btn fab__btn--play" id="musicToggle" type="button" aria-label="Putar atau jeda musik">
     <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v3M12 18v3"/></svg>
   </button>
-</div>
-
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Pengaturan musik">
-  <div class="sheet__bg" data-close></div>
-  <div class="sheet__panel">
-    <h3 class="sheet__h">Musik Latar</h3>
-    <p class="sheet__p">Pilih lagu, unggah dari perangkat, atau tempel tautan audio.</p>
-
-    <div id="trackList"></div>
-
-    <p class="sheet__lbl">Dari perangkat</p>
-    <label class="file-btn" for="musicFile">Pilih berkas audio (mp3 / m4a / ogg)</label>
-    <input id="musicFile" type="file" accept="audio/*" style="position:absolute;width:1px;height:1px;opacity:0">
-
-    <p class="sheet__lbl">Dari tautan</p>
-    <div class="row">
-      <input id="musicUrl" type="url" placeholder="https://…/lagu.mp3" inputmode="url">
-      <button class="btn btn--ghost" type="button" id="musicUrlBtn">Pakai</button>
-    </div>
-
-    <p class="sheet__lbl">Volume</p>
-    <input class="vol" id="musicVol" type="range" min="0" max="100" value="55" aria-label="Volume musik">
-
-    <p class="hint">Untuk mengganti daftar lagu bawaan secara permanen, ubah bagian <b>DAFTAR MUSIK</b> di dalam kode.</p>
-
-    <div style="margin-top:22px;text-align:center">
-      <button class="btn btn--solid" type="button" data-close>Selesai</button>
-    </div>
-  </div>
 </div>
 
 <audio id="bgm" loop preload="none"></audio>
@@ -701,6 +641,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     acara:   'Pernikahan Leo & Lily',
     lokasi:  'Pendopo Ageng Wijaya Kusuma, Sleman, Yogyakarta',
     volume:  0.55,
+	musik:   'musik/lagu.mp3',
 
     /* Tempel URL Web App dari Google Apps Script di sini
        (lihat berkas rsvp-google-apps-script.gs).
@@ -712,16 +653,6 @@ button{font:inherit;color:inherit;cursor:pointer}
        bot dan skrip otomatis yang menembak endpoint secara acak. */
     rsvpToken: 'leolily-2026-created-by-at41man'
   };
-
-  /* ---------- DAFTAR MUSIK ----------
-     Isi 'src' dengan berkas Anda, mis. 'musik/lagu-1.mp3'
-     atau tautan langsung ke file audio. Kosongkan bila belum ada. */
-  var TRACKS = [
-    { judul: 'Canon in D',        oleh: 'Instrumental piano', src: '' },
-    { judul: 'A Thousand Years',  oleh: 'Instrumental biola',  src: '' },
-    { judul: 'Beautiful in White',oleh: 'Instrumental gitar',  src: '' }
-  ];
-  /* ============================================================ */
 
   var MULAI = Date.now();
   var $  = function(s,c){ return (c||document).querySelector(s); };
@@ -898,91 +829,47 @@ button{font:inherit;color:inherit;cursor:pointer}
     }).then(function(){ selesai(true); }, function(){ selesai(false); });
   });
 
-  /* ---------- MUSIK ---------- */
-  var audio = $('#bgm');
+  /* ---------- MUSIK LATAR ---------- */
+  var audio  = $('#bgm');
   var toggle = $('#musicToggle');
-  var current = 0;
-  var objectUrl = null;
   audio.volume = CONFIG.volume;
+  if(CONFIG.musik){ audio.src = CONFIG.musik; }
 
-  function setSource(src){
-    if(!src){ return false; }
-    audio.src = src;
-    return true;
-  }
   function playMusic(){
-    if(!audio.src && !setSource(TRACKS[0] && TRACKS[0].src)) return;
+    if(!audio.src) return;
     var p = audio.play();
     if(p && p.catch){ p.catch(function(){}); }
   }
-  function syncIcon(){
-    toggle.classList.toggle('is-playing', !audio.paused);
-  }
-  audio.addEventListener('play', syncIcon);
+  function syncIcon(){ toggle.classList.toggle('is-playing', !audio.paused); }
+  audio.addEventListener('play',  syncIcon);
   audio.addEventListener('pause', syncIcon);
 
   toggle.addEventListener('click', function(){
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
-  /* daftar lagu di panel */
-  function renderTracks(){
-    var box = $('#trackList');
-    box.innerHTML = '';
-    TRACKS.forEach(function(t,i){
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'track' + (i===current ? ' is-active' : '');
-      b.innerHTML = '<span class="track__i"></span><span class="track__t"></span>';
-      b.querySelector('.track__t').textContent = t.judul;
-      var s = document.createElement('span');
-      s.className = 'track__s';
-      s.textContent = t.src ? t.oleh : t.oleh + ' · belum diisi';
-      b.querySelector('.track__t').appendChild(s);
-      b.addEventListener('click', function(){
-        current = i;
-        renderTracks();
-        if(setSource(t.src)){ playMusic(); }
+  /* Video galeri: begitu tamu menekan play, musik latar otomatis berhenti,
+     lalu lanjut sendiri setelah video dijeda atau habis. */
+  var video = $('#galeriVideo');
+  if(video){
+    video.addEventListener('play', function(){
+      if(!audio.paused){ audio.pause(); audio.dataset.duck = '1'; }
+    });
+    ['pause','ended'].forEach(function(ev){
+      video.addEventListener(ev, function(){
+        if(audio.dataset.duck === '1'){ audio.dataset.duck = ''; playMusic(); }
       });
-      box.appendChild(b);
     });
   }
-  renderTracks();
 
-  $('#musicFile').addEventListener('change', function(e){
-    var f = e.target.files && e.target.files[0];
-    if(!f) return;
-    if(objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = URL.createObjectURL(f);
-    current = -1; renderTracks();
-    setSource(objectUrl); playMusic();
-  });
-
-  $('#musicUrlBtn').addEventListener('click', function(){
-    var u = $('#musicUrl').value.trim();
-    if(!u) return;
-    current = -1; renderTracks();
-    setSource(u); playMusic();
-  });
-
-  $('#musicVol').addEventListener('input', function(e){
-    audio.volume = e.target.value/100;
-  });
-
-  /* panel */
-  var sheet = $('#sheet');
-  $('#musicSettings').addEventListener('click', function(){ sheet.classList.add('is-open'); });
-  $$('[data-close]').forEach(function(el){
-    el.addEventListener('click', function(){ sheet.classList.remove('is-open'); });
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') sheet.classList.remove('is-open');
-  });
-
-  /* jeda musik saat tab tidak aktif — hemat baterai */
+  /* Jeda saat tab tidak aktif — hemat baterai dan kuota */
   document.addEventListener('visibilitychange', function(){
-    if(document.hidden && !audio.paused){ audio.pause(); audio.dataset.resume = '1'; }
-    else if(!document.hidden && audio.dataset.resume === '1'){ audio.dataset.resume = ''; playMusic(); }
+    if(document.hidden){
+      if(video && !video.paused){ video.pause(); }
+      if(!audio.paused){ audio.pause(); audio.dataset.resume = '1'; }
+    }else if(audio.dataset.resume === '1'){
+      audio.dataset.resume = ''; playMusic();
+    }
   });
 })();
 </script>
