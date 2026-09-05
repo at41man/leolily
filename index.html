@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo & Lily — Sabtu, 12 Desember 2026.">
-<meta name="theme-color" content="#3D141E">
+<meta name="theme-color" content="#16261E">
 
 <!--
 ==================================================================
@@ -25,14 +25,14 @@
 <style>
 /* ---------- TOKEN ---------- */
 :root{
-  --paper:#FBF7F0;
-  --paper-2:#F2E9DB;
-  --ink:#2B211C;
-  --ink-soft:#7A6A5D;
-  --claret:#5E1F2D;
-  --claret-deep:#3A121C;
-  --gold:#A8873F;
-  --gold-2:#D8BE86;
+  --paper:#F9FBF6;
+  --paper-2:#E8F0E2;
+  --ink:#22302A;
+  --ink-soft:#617568;
+  --claret:#2E5140;
+  --claret-deep:#16261E;
+  --gold:#55785B;
+  --gold-2:#C6DBC3;
   --app:520px;
   --edge:22px;
   --f-display:'Italiana',serif;
@@ -320,6 +320,69 @@ button{font:inherit;color:inherit;cursor:pointer}
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
   .rv{opacity:1;transform:none}
 }
+/* ===== NUANSA HIJAU & TEKSTUR ===== */
+
+/* Tekstur kertas: butiran halus + cahaya hijau di ujung atas & bawah.
+   SVG inline, tanpa file tambahan, dan hanya dilukis sekali. */
+.app{
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(120% 50% at 50% 0%,rgba(85,120,91,.09),transparent 65%),
+    radial-gradient(120% 40% at 50% 100%,rgba(85,120,91,.06),transparent 65%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
+  background-repeat:no-repeat,no-repeat,repeat;
+  background-size:auto,auto,200px 200px;
+}
+
+/* Anyaman linen tipis di section bernuansa */
+.sec--tint{
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 1px,transparent 1px 5px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0 1px,transparent 1px 5px);
+}
+
+/* Section gelap: beri cahaya lembut dari atas biar tidak rata */
+.sec--dark{color:#E8F0E6;background-image:radial-gradient(95% 65% at 50% 0%,rgba(126,168,131,.2),transparent 70%)}
+.sec--dark .lead{color:rgba(232,240,230,.72)}
+.count__l{color:rgba(232,240,230,.6)}
+.bank__nm{color:rgba(232,240,230,.65)}
+.count__cell{border-color:rgba(198,219,195,.3)}
+.bank{border-color:rgba(198,219,195,.28)}
+.copy{border-color:rgba(198,219,195,.42)}
+.copy:hover{color:#12211A}
+
+/* Sampul */
+.cover__half::after{background:linear-gradient(180deg,rgba(22,38,30,.5),rgba(22,38,30,.88))}
+.cover__body{color:#EAF2E7}
+.cover__names{color:#FBFDF9}
+.cover__date{color:rgba(234,242,231,.85)}
+.cover__to{color:rgba(234,242,231,.7)}
+.cover__note{color:rgba(198,219,195,.55)}
+
+/* Garis halus & bingkai */
+.hero__frame{border-color:rgba(85,120,91,.35)}
+.event{border-color:rgba(85,120,91,.3)}
+.event__hr{background:rgba(85,120,91,.45)}
+.person__ig{border-bottom-color:rgba(85,120,91,.4)}
+.wish{border-top-color:rgba(85,120,91,.25)}
+.field input,.field select,.field textarea{border-color:rgba(85,120,91,.38)}
+.track__i{background:rgba(85,120,91,.3)}
+.file-btn{border-color:rgba(85,120,91,.55)}
+.btn--ghost{border-color:rgba(85,120,91,.5)}
+.sheet__bg{background:rgba(14,28,20,.55)}
+
+/* Placeholder foto */
+.ph{
+  background:
+    repeating-linear-gradient(-45deg,transparent 0 9px,rgba(85,120,91,.07) 9px 10px),
+    var(--paper-2);
+  border-color:rgba(85,120,91,.5);
+}
+.sec--dark .ph{border-color:rgba(198,219,195,.4)}
+
+/* Kontras teks pada tombol */
+.btn:hover,.btn:focus-visible{color:#12211A}
+.btn--solid,.btn--solid:hover,.btn--solid:focus-visible,.btn--ghost:hover,.btn--ghost:focus-visible{color:#FBFDF9}
 </style>
 </head>
 
