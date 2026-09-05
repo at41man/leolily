@@ -563,26 +563,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="wishes" id="wishes"></div>
   </section>
 
-  <!-- GIFT -->
-  <section class="sec sec--dark">
-    <p class="eyebrow rv" style="color:var(--gold-2)">Wedding Gift</p>
-    <h2 class="h-sec rv" style="margin-bottom:8px">Amplop Digital</h2>
-    <p class="lead rv rv-2">Doa restu Anda sudah lebih dari cukup. Namun bila ingin memberi tanda kasih, silakan melalui rekening berikut.</p>
-
-    <div class="bank rv rv-2">
-      <p class="eyebrow" style="margin:0">Bank BCA</p>
-      <p class="bank__no" data-acc="1234567890">1234567890</p>
-      <p class="bank__nm">a.n. Leonardo Adhi Wicaksana</p>
-      <button class="copy" type="button">Salin Nomor</button>
-    </div>
-
-    <div class="bank rv rv-3">
-      <p class="eyebrow" style="margin:0">Bank Mandiri</p>
-      <p class="bank__no" data-acc="9876543210">9876543210</p>
-      <p class="bank__nm">a.n. Liliana Amara Rusli</p>
-      <button class="copy" type="button">Salin Nomor</button>
-    </div>
-  </section>
 
   <!-- PENUTUP -->
   <section class="sec sec--flush" style="padding-bottom:0">
@@ -685,10 +665,23 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
   /* ---------- Nama tamu dari URL: ?to=Budi%20Santoso ---------- */
-  try{
-    var to = new URLSearchParams(location.search).get('to');
-    if(to){ $('#guestName').textContent = to; }
-  }catch(e){}
+	var TAMU = (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var v = (q.get('to') || q.get('u') || '').replace(/[-_]+/g, ' ');
+      v = v.replace(/\s+/g, ' ').trim().slice(0, 60);
+      return v.replace(/\S+/g, function(w){
+        return w === w.toLowerCase() ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+      });
+    }catch(e){ return ''; }
+  })();
+
+  if(TAMU){
+    $('#guestName').textContent = TAMU;
+    document.title = TAMU + ' — Undangan Pernikahan Leo & Lily';
+    var isiNama = $('#gName');
+    if(isiNama && !isiNama.value){ isiNama.value = TAMU; }
+  }
 
   /* ---------- Buka sampul ---------- */
   var cover = $('#cover');
@@ -807,7 +800,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     var data = {
       nama: nama, kehadiran: status, jumlah: jumlah, ucapan: pesan,
       waktu: new Date().toISOString(),
-      undangan: (new URLSearchParams(location.search).get('to') || ''),
+      undangan: TAMU,
       token: CONFIG.rsvpToken,
       hp: $('#gSite').value,                        // honeypot, harus kosong
       dwell: Math.round((Date.now() - MULAI)/1000)  // detik sejak halaman dibuka
