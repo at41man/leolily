@@ -667,9 +667,14 @@ button{font:inherit;color:inherit;cursor:pointer}
   /* ---------- Nama tamu dari URL: ?to=Budi%20Santoso ---------- */
 	var TAMU = (function(){
     try{
-      var q = new URLSearchParams(location.search);
-      var v = (q.get('to') || q.get('u') || '').replace(/[-_]+/g, ' ');
-      v = v.replace(/\s+/g, ' ').trim().slice(0, 60);
+      var s = location.search.replace(/^\?/, '');
+      // Ambil SELURUH sisa string setelah to= / u= supaya karakter &
+      // di dalam nama tidak dianggap pemisah parameter.
+      var m = s.match(/^(?:to|u)=([\s\S]*)$/i);
+      var v = m ? m[1] : (new URLSearchParams(s).get('to') || location.hash.replace(/^#/, ''));
+      v = v.replace(/\+/g, ' ');
+      try{ v = decodeURIComponent(v); }catch(e){}
+      v = v.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
       return v.replace(/\S+/g, function(w){
         return w === w.toLowerCase() ? w.charAt(0).toUpperCase() + w.slice(1) : w;
       });
