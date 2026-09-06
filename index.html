@@ -142,6 +142,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sec--dark .ph{background:rgba(255,255,255,.04);border-color:rgba(198,219,195,.4)}
 .ph img,.ph .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
 .ph .vid{background:#0C1712}
+.vid__snd{
+  position:absolute;right:10px;bottom:10px;z-index:3;
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(22,38,30,.55);border:1px solid rgba(198,219,195,.45);color:#EAF2E7;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+}
+.vid__snd svg{width:17px;height:17px}
+.vid__snd .on{display:none}
+.vid__snd.is-on .on{display:block}
+.vid__snd.is-on .off{display:none}
 .ph__tag{
   font-family:var(--f-util);
   font-size:12px;
@@ -458,12 +468,14 @@ button{font:inherit;color:inherit;cursor:pointer}
       </figure>
 
       <!-- Video: taruh berkasnya di folder video/, poster di folder foto/ -->
-      <figure class="ph gal__wide rv" style="--ar:16/9">
-        <video id="galeriVideo" class="vid" controls playsinline preload="metadata"
-               poster="foto/video-poster.jpg">
-          <source src="video/prewedding.mp4" type="video/mp4">
-        </video>
-        <figcaption class="ph__tag"><b>Video</b><small>video/prewedding.mp4</small></figcaption>
+		<figure class="ph gal__wide rv" style="--ar:16/9">
+        <video id="galeriVideo" class="vid" autoplay muted loop playsinline
+               preload="none" poster="foto/video-poster.jpg"
+               data-src="video/teaser.mp4"></video>
+        <button class="vid__snd" id="vidSound" type="button" aria-label="Nyalakan suara video">
+          <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
+          <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 8.5a5 5 0 0 1 0 7M20 6a9 9 0 0 1 0 12"/></svg>
+        </button>
       </figure>
     </div>
   </section>
@@ -780,18 +792,46 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
-  /* Video galeri: begitu tamu menekan play, musik latar berhenti,
-     lalu lanjut sendiri setelah video dijeda atau habis. */
-  var video = $('#galeriVideo');
+  /* Video galeri: berputar sendiri tanpa suara saat terlihat di layar,
+     berhenti saat keluar layar. Berkasnya baru diunduh ketika dibutuhkan. */
+  var video    = $('#galeriVideo');
+  var vidSound = $('#vidSound');
+
+  function mainkanVideo(){
+    if(!video) return;
+    if(!video.src && video.dataset.src){ video.src = video.dataset.src; }
+    var p = video.play();
+    if(p && p.catch){ p.catch(function(){}); }
+  }
+
   if(video){
-    video.addEventListener('play', function(){
-      if(!audio.paused){ audio.pause(); audio.dataset.duck = '1'; }
-    });
-    ['pause','ended'].forEach(function(ev){
-      video.addEventListener(ev, function(){
-        if(audio.dataset.duck === '1'){ audio.dataset.duck = ''; playMusic(); }
+    if('IntersectionObserver' in window){
+      var vio = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ video.dataset.inview = '1'; mainkanVideo(); }
+          else { video.dataset.inview = ''; video.pause(); }
+        });
+      }, { threshold:.35 });
+      vio.observe(video);
+    }else{
+      mainkanVideo();
+    }
+
+    /* Tombol suara. Video bersuara -> musik latar berhenti,
+       lalu lanjut lagi begitu video dibisukan kembali. */
+    if(vidSound){
+      vidSound.addEventListener('click', function(){
+        video.muted = !video.muted;
+        vidSound.classList.toggle('is-on', !video.muted);
+        vidSound.setAttribute('aria-label', video.muted ? 'Nyalakan suara video' : 'Matikan suara video');
+        if(!video.muted){
+          if(!audio.paused){ audio.pause(); audio.dataset.duck = '1'; }
+          mainkanVideo();
+        }else if(audio.dataset.duck === '1'){
+          audio.dataset.duck = ''; playMusic();
+        }
       });
-    });
+    }
   }
 
   /* Jeda saat tab tidak aktif — hemat baterai dan kuota */
@@ -799,8 +839,9 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(document.hidden){
       if(video && !video.paused){ video.pause(); }
       if(!audio.paused){ audio.pause(); audio.dataset.resume = '1'; }
-    }else if(audio.dataset.resume === '1'){
-      audio.dataset.resume = ''; playMusic();
+    }else{
+      if(audio.dataset.resume === '1'){ audio.dataset.resume = ''; playMusic(); }
+      if(video && video.dataset.inview === '1'){ mainkanVideo(); }
     }
   });
 })();
