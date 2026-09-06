@@ -9,12 +9,11 @@
 
 <!--
 ==================================================================
-  PANDUAN CEPAT — semua yang perlu Anda ganti ditandai "GANTI"
-  1. FOTO      : cari komentar, hapus komentar
-                 pada baris <img> dan isi src-nya.
-  2. MUSIK     : cari "DAFTAR MUSIK" di bagian <script> paling bawah.
-  3. DATA      : nama, tanggal, lokasi, rekening ada di dalam HTML.
-  4. TANGGAL   : ubah CONFIG.tanggal di <script> untuk hitung mundur.
+  YANG PERLU DIISI — semuanya ada di blok CONFIG dalam <script>
+  1. rsvpEndpoint : URL Web App dari Google Apps Script
+  2. rsvpToken    : samakan persis dengan TOKEN di Apps Script
+  3. musik        : letakkan berkasnya di folder musik/
+  4. video        : letakkan berkasnya di folder video/ + poster
 ==================================================================
 -->
 
@@ -59,9 +58,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 .app{
   max-width:var(--app);
   margin:0 auto;
-  background:var(--paper);
+  background-color:var(--paper);
   overflow:hidden;
   box-shadow:0 0 80px rgba(0,0,0,.45);
+  /* Tekstur kertas: butiran halus + cahaya hijau di ujung atas & bawah.
+     SVG inline, tanpa berkas tambahan, hanya dilukis sekali. */
+  background-image:
+    radial-gradient(120% 50% at 50% 0%,rgba(85,120,91,.09),transparent 65%),
+    radial-gradient(120% 40% at 50% 100%,rgba(85,120,91,.06),transparent 65%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
+  background-repeat:no-repeat,no-repeat,repeat;
+  background-size:auto,auto,200px 200px;
 }
 
 /* ---------- TIPOGRAFI ---------- */
@@ -103,10 +110,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ---------- LAYOUT ---------- */
 .sec{padding:clamp(58px,13vw,96px) var(--edge);text-align:center;position:relative}
-.sec--tint{background:var(--paper-2)}
-.sec--dark{background:var(--claret-deep);color:#EFE3D2}
+.sec--tint{
+  background-color:var(--paper-2);
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 1px,transparent 1px 5px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0 1px,transparent 1px 5px);
+}
+.sec--dark{
+  background-color:var(--claret-deep);
+  color:#E8F0E6;
+  background-image:radial-gradient(95% 65% at 50% 0%,rgba(126,168,131,.2),transparent 70%);
+}
 .sec--dark .h-sec,.sec--dark .h-display{color:var(--gold-2)}
-.sec--dark .lead{color:rgba(239,227,210,.72)}
+.sec--dark .lead{color:rgba(232,240,230,.72)}
 .sec--flush{padding-left:0;padding-right:0}
 .inner{padding-inline:var(--edge)}
 
@@ -116,15 +132,16 @@ button{font:inherit;color:inherit;cursor:pointer}
   margin:0;
   aspect-ratio:var(--ar,4/5);
   background:
-    repeating-linear-gradient(-45deg,transparent 0 9px,rgba(168,135,63,.07) 9px 10px),
+    repeating-linear-gradient(-45deg,transparent 0 9px,rgba(85,120,91,.07) 9px 10px),
     var(--paper-2);
-  border:1px dashed rgba(168,135,63,.6);
+  border:1px dashed rgba(85,120,91,.5);
   overflow:hidden;
   display:grid;
   place-items:center;
 }
-.sec--dark .ph{background:rgba(255,255,255,.04);border-color:rgba(216,190,134,.45)}
-.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.sec--dark .ph{background:rgba(255,255,255,.04);border-color:rgba(198,219,195,.4)}
+.ph img,.ph .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.ph .vid{background:#0C1712}
 .ph__tag{
   font-family:var(--f-util);
   font-size:12px;
@@ -145,14 +162,13 @@ button{font:inherit;color:inherit;cursor:pointer}
   position:absolute;left:0;right:0;height:50%;
   background-color:var(--claret-deep);
   background-image:var(--cover-img,none);
-  background-size:100% 100%;
   background-repeat:no-repeat;
   transition:transform 1.15s cubic-bezier(.66,0,.2,1);
   will-change:transform;
 }
 .cover__half--t{top:0;background-position:center top;background-size:100% 200%}
 .cover__half--b{bottom:0;background-position:center bottom;background-size:100% 200%}
-.cover__half::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(58,18,28,.62),rgba(58,18,28,.86))}
+.cover__half::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,38,30,.5),rgba(22,38,30,.88))}
 .cover__seam{
   position:absolute;left:12%;right:12%;top:50%;height:1px;
   background:linear-gradient(90deg,transparent,var(--gold-2),transparent);
@@ -161,16 +177,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 .cover__body{
   position:absolute;inset:0;z-index:3;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;padding:40px 26px;text-align:center;color:#F3E7D6;
+  gap:8px;padding:40px 26px;text-align:center;color:#EAF2E7;
   transition:opacity .55s ease,transform .55s ease;
 }
 .cover__body .eyebrow{color:var(--gold-2)}
-.cover__names{font-family:var(--f-display);font-size:clamp(46px,15vw,68px);line-height:1.02;color:#FBF7F0;margin:2px 0 6px}
+.cover__names{font-family:var(--f-display);font-size:clamp(46px,15vw,68px);line-height:1.02;color:#FBFDF9;margin:2px 0 6px}
 .cover__amp{display:block;font-family:var(--f-body);font-style:italic;font-size:.42em;color:var(--gold-2);margin:2px 0}
-.cover__date{font-family:var(--f-util);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(243,231,214,.85)}
-.cover__to{margin-top:30px;font-size:15px;color:rgba(243,231,214,.7)}
+.cover__date{font-family:var(--f-util);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(234,242,231,.85)}
+.cover__to{margin-top:30px;font-size:15px;color:rgba(234,242,231,.7)}
 .cover__guest{font-family:var(--f-display);font-size:26px;color:var(--gold-2);margin:2px 0 22px}
-.cover__note{position:absolute;bottom:16px;left:0;right:0;font-family:var(--f-util);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(216,190,134,.55)}
 
 .btn{
   display:inline-flex;align-items:center;gap:10px;
@@ -178,11 +193,12 @@ button{font:inherit;color:inherit;cursor:pointer}
   padding:14px 28px;border:1px solid var(--gold);background:transparent;color:var(--gold-2);
   border-radius:2px;transition:background .35s ease,color .35s ease;
 }
-.btn:hover,.btn:focus-visible{background:var(--gold);color:#2B1116}
-.btn--solid{background:var(--claret);border-color:var(--claret);color:#FBF7F0}
-.btn--solid:hover,.btn--solid:focus-visible{background:var(--claret-deep);border-color:var(--claret-deep);color:#FBF7F0}
-.btn--ghost{border-color:rgba(168,135,63,.55);color:var(--claret)}
-.btn--ghost:hover,.btn--ghost:focus-visible{background:var(--claret);border-color:var(--claret);color:#FBF7F0}
+.btn:hover,.btn:focus-visible{background:var(--gold);color:#12211A}
+.btn--solid{background:var(--claret);border-color:var(--claret);color:#FBFDF9}
+.btn--solid:hover,.btn--solid:focus-visible{background:var(--claret-deep);border-color:var(--claret-deep);color:#FBFDF9}
+.btn--ghost{border-color:rgba(85,120,91,.5);color:var(--claret)}
+.btn--ghost:hover,.btn--ghost:focus-visible{background:var(--claret);border-color:var(--claret);color:#FBFDF9}
+.btn[disabled]{opacity:.55;cursor:default}
 
 /* cover terbuka */
 .cover.is-open .cover__half--t{transform:translateY(-100%)}
@@ -192,8 +208,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .cover.is-gone{display:none}
 
 /* ---------- HERO ---------- */
-.hero{position:relative;padding:clamp(56px,14vw,96px) var(--edge);text-align:center;background:var(--paper)}
-.hero__frame{position:relative;padding:clamp(26px,7vw,40px) clamp(16px,5vw,28px);border:1px solid rgba(168,135,63,.4)}
+.hero{position:relative;padding:clamp(56px,14vw,96px) var(--edge);text-align:center}
+.hero__frame{position:relative;padding:clamp(26px,7vw,40px) clamp(16px,5vw,28px);border:1px solid rgba(85,120,91,.35)}
 .hero__frame::before,.hero__frame::after{content:'';position:absolute;width:9px;height:9px;border:1px solid var(--gold);transform:rotate(45deg);background:var(--paper)}
 .hero__frame::before{top:-5px;left:calc(50% - 5px)}
 .hero__frame::after{bottom:-5px;left:calc(50% - 5px)}
@@ -203,27 +219,28 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---------- MEMPELAI ---------- */
 .pair{display:grid;gap:clamp(38px,10vw,52px)}
 .person__name{font-family:var(--f-display);font-size:clamp(28px,7.5vw,34px);color:var(--claret);margin:20px 0 2px;line-height:1.2}
+.person__nick{font-family:var(--f-body);font-style:italic;font-size:.62em;color:var(--gold)}
 .person__meta{font-size:15.5px;color:var(--ink-soft);margin:0}
 .person__ig{
   display:inline-flex;align-items:center;gap:7px;margin-top:14px;
   font-family:var(--f-util);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(168,135,63,.4);padding-bottom:3px
+  color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(85,120,91,.4);padding-bottom:3px
 }
 .amp-divider{font-family:var(--f-display);font-size:34px;color:var(--gold);line-height:1}
 
 /* ---------- COUNTDOWN ---------- */
 .count{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:400px;margin:30px auto 0}
-.count__cell{border:1px solid rgba(216,190,134,.32);padding:14px 4px}
+.count__cell{border:1px solid rgba(198,219,195,.3);padding:14px 4px}
 .count__n{font-family:var(--f-display);font-size:clamp(26px,7.5vw,34px);line-height:1;color:var(--gold-2)}
-.count__l{font-family:var(--f-util);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(239,227,210,.6);margin-top:8px}
+.count__l{font-family:var(--f-util);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,240,230,.6);margin-top:8px}
 
 /* ---------- ACARA ---------- */
-.event{border:1px solid rgba(168,135,63,.38);padding:clamp(26px,7vw,36px) 20px;background:var(--paper)}
+.event{border:1px solid rgba(85,120,91,.3);padding:clamp(26px,7vw,36px) 20px;background:var(--paper)}
 .event + .event{margin-top:20px}
 .event__t{font-family:var(--f-display);font-size:27px;color:var(--claret);margin:14px 0 12px}
 .event__row{font-size:16.5px;color:var(--ink-soft);margin:0}
 .event__row strong{color:var(--ink);font-weight:500}
-.event__hr{width:44px;height:1px;background:rgba(168,135,63,.5);margin:16px auto}
+.event__hr{width:44px;height:1px;background:rgba(85,120,91,.45);margin:16px auto}
 
 /* ---------- GALERI ---------- */
 .gal{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-inline:var(--edge)}
@@ -234,26 +251,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .field label{display:block;font-family:var(--f-util);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
 .field input,.field select,.field textarea{
   width:100%;padding:12px 14px;font-family:var(--f-body);font-size:16px;color:var(--ink);
-  background:var(--paper);border:1px solid rgba(168,135,63,.42);border-radius:2px;outline:none;
+  background:var(--paper);border:1px solid rgba(85,120,91,.38);border-radius:2px;outline:none;
 }
 .field textarea{resize:vertical;min-height:96px}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--claret)}
+.hint{font-size:14px;color:var(--ink-soft);margin:12px 0 0;line-height:1.6;min-height:1px}
+.hint--ok{color:var(--claret)}
+.hint--warn{color:#8A5A2B}
 .wishes{margin-top:26px;text-align:left;max-height:300px;overflow-y:auto}
-.wish{border-top:1px solid rgba(168,135,63,.28);padding:15px 0}
+.wish{border-top:1px solid rgba(85,120,91,.25);padding:15px 0}
 .wish__n{font-family:var(--f-util);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--claret);margin:0}
 .wish__s{font-family:var(--f-util);font-size:10px;letter-spacing:.12em;color:var(--gold);margin:3px 0 7px}
 .wish__m{margin:0;font-size:16px;color:var(--ink-soft)}
-
-/* ---------- GIFT ---------- */
-.bank{border:1px solid rgba(216,190,134,.3);padding:22px 18px;margin-top:16px}
-.bank__no{font-family:var(--f-util);font-size:19px;letter-spacing:.1em;color:var(--gold-2);margin:8px 0 4px}
-.bank__nm{font-family:var(--f-util);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(239,227,210,.65);margin:0 0 16px}
-.copy{
-  font-family:var(--f-util);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
-  background:none;border:1px solid rgba(216,190,134,.45);color:var(--gold-2);padding:9px 18px;border-radius:2px;
-  transition:background .3s ease,color .3s ease
-}
-.copy:hover{background:var(--gold);color:#2B1116}
 
 /* ---------- KONTROL MUSIK ---------- */
 .fab{
@@ -270,10 +279,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fab__btn--play.is-playing svg{animation:spin 5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.ph .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#0C1712}
-
-.hint{font-size:14px;color:var(--ink-soft);margin:8px 0 0;line-height:1.6}
-
 /* ---------- REVEAL (ringan: opacity + transform saja) ---------- */
 .rv{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.6,.2,1)}
 .rv.is-in{opacity:1;transform:none}
@@ -289,76 +294,12 @@ button{font:inherit;color:inherit;cursor:pointer}
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
   .rv{opacity:1;transform:none}
 }
-/* ===== NUANSA HIJAU & TEKSTUR ===== */
-
-/* Tekstur kertas: butiran halus + cahaya hijau di ujung atas & bawah.
-   SVG inline, tanpa file tambahan, dan hanya dilukis sekali. */
-.app{
-  background-color:var(--paper);
-  background-image:
-    radial-gradient(120% 50% at 50% 0%,rgba(85,120,91,.09),transparent 65%),
-    radial-gradient(120% 40% at 50% 100%,rgba(85,120,91,.06),transparent 65%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
-  background-repeat:no-repeat,no-repeat,repeat;
-  background-size:auto,auto,200px 200px;
-}
-
-/* Anyaman linen tipis di section bernuansa */
-.sec--tint{
-  background-image:
-    repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 1px,transparent 1px 5px),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0 1px,transparent 1px 5px);
-}
-
-/* Section gelap: beri cahaya lembut dari atas biar tidak rata */
-.sec--dark{color:#E8F0E6;background-image:radial-gradient(95% 65% at 50% 0%,rgba(126,168,131,.2),transparent 70%)}
-.sec--dark .lead{color:rgba(232,240,230,.72)}
-.count__l{color:rgba(232,240,230,.6)}
-.bank__nm{color:rgba(232,240,230,.65)}
-.count__cell{border-color:rgba(198,219,195,.3)}
-.bank{border-color:rgba(198,219,195,.28)}
-.copy{border-color:rgba(198,219,195,.42)}
-.copy:hover{color:#12211A}
-
-/* Sampul */
-.cover__half::after{background:linear-gradient(180deg,rgba(22,38,30,.5),rgba(22,38,30,.88))}
-.cover__body{color:#EAF2E7}
-.cover__names{color:#FBFDF9}
-.cover__date{color:rgba(234,242,231,.85)}
-.cover__to{color:rgba(234,242,231,.7)}
-.cover__note{color:rgba(198,219,195,.55)}
-
-/* Garis halus & bingkai */
-.hero__frame{border-color:rgba(85,120,91,.35)}
-.event{border-color:rgba(85,120,91,.3)}
-.event__hr{background:rgba(85,120,91,.45)}
-.person__ig{border-bottom-color:rgba(85,120,91,.4)}
-.wish{border-top-color:rgba(85,120,91,.25)}
-.field input,.field select,.field textarea{border-color:rgba(85,120,91,.38)}
-.track__i{background:rgba(85,120,91,.3)}
-.file-btn{border-color:rgba(85,120,91,.55)}
-.btn--ghost{border-color:rgba(85,120,91,.5)}
-.sheet__bg{background:rgba(14,28,20,.55)}
-
-/* Placeholder foto */
-.ph{
-  background:
-    repeating-linear-gradient(-45deg,transparent 0 9px,rgba(85,120,91,.07) 9px 10px),
-    var(--paper-2);
-  border-color:rgba(85,120,91,.5);
-}
-.sec--dark .ph{border-color:rgba(198,219,195,.4)}
-
-/* Kontras teks pada tombol */
-.btn:hover,.btn:focus-visible{color:#12211A}
-.btn--solid,.btn--solid:hover,.btn--solid:focus-visible,.btn--ghost:hover,.btn--ghost:focus-visible{color:#FBFDF9}
 </style>
 </head>
 
 <body class="is-locked">
 
 <!-- =================== SAMPUL =================== -->
-<!-- GANTI FOTO COVER: tambahkan style="--cover-img:url('foto/cover.jpg')" pada div di bawah -->
 <div class="cover" id="cover" style="--cover-img:url('foto/0.jpg')">
   <div class="cover__inner">
     <div class="cover__half cover__half--t"></div>
@@ -378,8 +319,6 @@ button{font:inherit;color:inherit;cursor:pointer}
         Buka Undangan
       </button>
     </div>
-
-<!--    <p class="cover__note">Foto sampul · 1080 × 1920 px</p>-->
   </div>
 </div>
 
@@ -403,10 +342,10 @@ button{font:inherit;color:inherit;cursor:pointer}
       <path d="M100 8l9 9-9 9-9-9z"/>
       <path d="M84 17c-4-5-9-5-13 0 4 5 9 5 13 0zM116 17c4-5 9-5 13 0-4 5-9 5-13 0z"/>
     </svg>
-    <p class="lead script rv rv-2" style="font-size:20px;margin-top:26px;max-width:30ch">
-      “Tuhan Menjadikan Segala Sesuatu Indah Pada Waktu NYA<br>Indah Saat Ia Mempertemukan<br>Indah Saat Ia Menumbuhkan Kasih<br>Dan Indah Saat Ia Menyatukan Kami<br>Dalam Pernikahan Kudus”
-    </p><br>
-     <svg class="orn rv" viewBox="0 0 200 34" fill="none" stroke="currentColor" stroke-width="1">
+    <p class="lead script rv rv-2" style="font-size:20px;margin:26px auto 26px;max-width:30ch">
+      “Tuhan Menjadikan Segala Sesuatu Indah Pada Waktu-Nya<br>Indah Saat Ia Mempertemukan<br>Indah Saat Ia Menumbuhkan Kasih<br>Dan Indah Saat Ia Menyatukan Kami<br>Dalam Pernikahan Kudus”
+    </p>
+    <svg class="orn rv rv-2" viewBox="0 0 200 34" fill="none" stroke="currentColor" stroke-width="1">
       <path d="M0 17h72M128 17h72"/>
       <path d="M100 8l9 9-9 9-9-9z"/>
       <path d="M84 17c-4-5-9-5-13 0 4 5 9 5 13 0zM116 17c4-5 9-5 13 0-4 5-9 5-13 0z"/>
@@ -421,35 +360,23 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     <div class="pair">
       <div class="rv">
-        <!-- GANTI FOTO MEMPELAI PRIA -->
         <figure class="ph" style="--ar:4/5">
-          <img src="foto/leo.jpg" alt="Leo">
-          <figcaption class="ph__tag">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2.5" y="5" width="19" height="15" rx="1.5"/><circle cx="12" cy="12" r="4"/><path d="M7 5l1.6-2h6.8L17 5"/></svg>
-            <b>800 × 1000 px</b>
-            <small>Potret · rasio 4:5</small>
-          </figcaption>
+          <img src="foto/leo.jpg" alt="Leonard Haryanto">
         </figure>
-        <h3 class="person__name">Leonard Haryanto<br><span style="font-family:var(--f-body);font-style:italic;font-size:.62em;color:var(--gold)">Leo</span></h3>
-        <p class="person__meta">Putra Kedua Anak Kedua dari<br>Alm. Tn. Barkah Harjanto ( Lie Hok Swie ) &amp; <br> Ny. Lindia Puspasari ( Go Lien Nio )</p>
-        <a class="person__ig" href="https://www.instagram.com/leonardharyanto_">@leonardharyanto_</a>
+        <h3 class="person__name">Leonard Haryanto<br><span class="person__nick">Leo</span></h3>
+        <p class="person__meta">Putra Kedua Anak Kedua dari<br>Alm. Tn. Barkah Harjanto ( Lie Hok Swie ) &amp;<br>Ny. Lindia Puspasari ( Go Lien Nio )</p>
+        <a class="person__ig" href="https://www.instagram.com/leonardharyanto_" target="_blank" rel="noopener">@leonardharyanto_</a>
       </div>
 
       <p class="amp-divider rv">&amp;</p>
 
       <div class="rv">
-        <!-- GANTI FOTO MEMPELAI WANITA -->
         <figure class="ph" style="--ar:4/5">
-          <img src="foto/lily.jpg" alt="Lily">
-          <figcaption class="ph__tag">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2.5" y="5" width="19" height="15" rx="1.5"/><circle cx="12" cy="12" r="4"/><path d="M7 5l1.6-2h6.8L17 5"/></svg>
-            <b>800 × 1000 px</b>
-            <small>Potret · rasio 4:5</small>
-          </figcaption>
+          <img src="foto/lily.jpg" alt="Louisa Lily Meliani Wijoyo">
         </figure>
-        <h3 class="person__name">Louisa Lily Meliani Wijoyo<br><span style="font-family:var(--f-body);font-style:italic;font-size:.62em;color:var(--gold)">Lily</span></h3>
-        <p class="person__meta">Putri kedua Anak kedua dari<br>Alm.Tn. Untung Wijoyo ( Oei Hoen Tjwan ) &amp; <br>Ny. Tienneke Soendjaja ( Soen Siu Lien )</p>
-        <a class="person__ig" href="https://www.instagram.com/lilymeliani">@lilymeliani</a>
+        <h3 class="person__name">Louisa Lily Meliani Wijoyo<br><span class="person__nick">Lily</span></h3>
+        <p class="person__meta">Putri Kedua Anak Kedua dari<br>Alm. Tn. Untung Wijoyo ( Oei Hoen Tjwan ) &amp;<br>Ny. Tienneke Soendjaja ( Soen Siu Lien )</p>
+        <a class="person__ig" href="https://www.instagram.com/lilymeliani" target="_blank" rel="noopener">@lilymeliani</a>
       </div>
     </div>
   </section>
@@ -471,13 +398,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <!-- FOTO LEBAR -->
   <section class="sec sec--flush" style="padding-top:0;padding-bottom:0">
-    <!-- GANTI FOTO BANNER -->
     <figure class="ph rv" style="--ar:16/9;border-left:0;border-right:0">
-      <img src="foto/3.jpg" alt="Prewedding">
-      <figcaption class="ph__tag">
-        <b>1920 × 1080 px</b>
-        <small>Lanskap · rasio 16:9</small>
-      </figcaption>
+      <img src="foto/3.jpg" alt="Prewedding" loading="lazy">
     </figure>
   </section>
 
@@ -491,7 +413,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <h3 class="event__t">Ibadah Pemberkatan Pernikahan</h3>
       <p class="event__row"><strong>10:30 WIB</strong></p>
       <div class="event__hr"></div>
-      <p class="event__row">Gereja Kristen Muria Indonesia (GKMI) Pemuda<br>Jl. Pemuda No.75<br>Semarang</p>
+      <p class="event__row">Gereja Kristen Muria Indonesia (GKMI) Pemuda<br>Jl. Pemuda No. 75<br>Semarang</p>
     </div>
 
     <div class="event rv rv-2">
@@ -499,9 +421,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       <h3 class="event__t">Resepsi Pernikahan</h3>
       <p class="event__row"><strong>18:00 WIB</strong></p>
       <div class="event__hr"></div>
-      <p class="event__row">Palace Fine Cuisine Ballroom Ruang Mahogany Lantai 3<br>Jl. MH Thamrin No.5<br>Semarang</p>
+      <p class="event__row">Palace Fine Cuisine Ballroom<br>Ruang Mahogany, Lantai 3<br>Jl. MH Thamrin No. 5, Semarang</p>
       <div style="margin-top:22px">
-        <!-- GANTI LINK MAPS -->
         <a class="btn btn--ghost" href="https://maps.app.goo.gl/YPZWsgvHtVnJNmGaA" target="_blank" rel="noopener">Lihat Lokasi</a>
       </div>
     </div>
@@ -515,39 +436,34 @@ button{font:inherit;color:inherit;cursor:pointer}
       <p class="lead rv rv-2" style="margin-bottom:32px">Sepenggal cerita perjalanan kami menuju hari yang dinanti.</p>
     </div>
 
-    <!-- GANTI FOTO GALERI: hapus komentar <img> lalu isi src -->
     <div class="gal">
       <figure class="ph gal__wide rv" style="--ar:3/2">
         <img src="foto/4.jpg" alt="Prewedding 1" loading="lazy">
-        <figcaption class="ph__tag"><b>1620 × 1080 px</b><small>Lanskap · 3:2</small></figcaption>
       </figure>
 
       <figure class="ph rv" style="--ar:4/5">
         <img src="foto/5.jpg" alt="Prewedding 2" loading="lazy">
-        <figcaption class="ph__tag"><b>1080 × 1350 px</b><small>Potret · 4:5</small></figcaption>
       </figure>
 
       <figure class="ph rv rv-2" style="--ar:4/5">
         <img src="foto/6.jpg" alt="Prewedding 3" loading="lazy">
-        <figcaption class="ph__tag"><b>1080 × 1350 px</b><small>Potret · 4:5</small></figcaption>
       </figure>
 
       <figure class="ph rv" style="--ar:1/1">
         <img src="foto/7.jpg" alt="Prewedding 4" loading="lazy">
-        <figcaption class="ph__tag"><b>1080 × 1080 px</b><small>Persegi · 1:1</small></figcaption>
       </figure>
 
       <figure class="ph rv rv-2" style="--ar:1/1">
         <img src="foto/8.jpg" alt="Prewedding 5" loading="lazy">
-        <figcaption class="ph__tag"><b>1080 × 1080 px</b><small>Persegi · 1:1</small></figcaption>
       </figure>
 
+      <!-- Video: taruh berkasnya di folder video/, poster di folder foto/ -->
       <figure class="ph gal__wide rv" style="--ar:16/9">
         <video id="galeriVideo" class="vid" controls playsinline preload="metadata"
                poster="foto/video-poster.jpg">
           <source src="video/prewedding.mp4" type="video/mp4">
         </video>
-        <figcaption class="ph__tag"><b>Video 1920 × 1080 px</b><small>MP4 H.264 · maks 30 MB</small></figcaption>
+        <figcaption class="ph__tag"><b>Video</b><small>video/prewedding.mp4</small></figcaption>
       </figure>
     </div>
   </section>
@@ -556,7 +472,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <section class="sec sec--tint">
     <p class="eyebrow rv">RSVP</p>
     <h2 class="h-sec rv" style="margin-bottom:8px">Konfirmasi Kehadiran</h2>
-    <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerjasama Bpk/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
+    <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerja sama Bapak/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
     <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 30 November 2026</p>
 
     <div class="rv rv-2">
@@ -583,6 +499,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <label for="gMsg">Ucapan &amp; doa <span style="text-transform:none;letter-spacing:0;font-style:italic;color:var(--ink-soft)">(opsional)</span></label>
         <textarea id="gMsg" placeholder="Tulis ucapan dan doa Anda…"></textarea>
       </div>
+
       <!-- Honeypot: tak terlihat manusia, tapi bot cenderung mengisinya. Jangan dihapus. -->
       <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
         <label for="gSite">Website</label>
@@ -590,19 +507,16 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
 
       <button class="btn btn--solid" type="button" id="sendWish">Kirim Konfirmasi</button>
-      <p class="hint" id="wishNote"></p>
+      <p class="hint" id="wishNote" role="status" aria-live="polite"></p>
     </div>
 
     <div class="wishes" id="wishes"></div>
   </section>
 
-
   <!-- PENUTUP -->
   <section class="sec sec--flush" style="padding-bottom:0">
-    <!-- GANTI FOTO PENUTUP -->
     <figure class="ph rv" style="--ar:4/5;border-left:0;border-right:0">
       <img src="foto/5.jpg" alt="Prewedding penutup" loading="lazy">
-      <figcaption class="ph__tag"><b>1080 × 1350 px</b><small>Potret · 4:5</small></figcaption>
     </figure>
   </section>
 
@@ -614,14 +528,14 @@ button{font:inherit;color:inherit;cursor:pointer}
   </section>
 
   <footer class="sec sec--dark" style="padding-top:34px;padding-bottom:34px">
-    <p class="eyebrow" style="margin:0;color:rgba(216,190,134,.55)">Soli Deo Gloria · 2026</p>
+    <p class="eyebrow" style="margin:0;color:rgba(198,219,195,.55)">Soli Deo Gloria · 2026</p>
   </footer>
 </main>
 
 <!-- =================== KONTROL MUSIK =================== -->
 <div class="fab" id="fab" hidden>
   <button class="fab__btn fab__btn--play" id="musicToggle" type="button" aria-label="Putar atau jeda musik">
-    <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v3M12 18v3"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v3M12 18v3"/></svg>
   </button>
 </div>
 
@@ -635,29 +549,32 @@ button{font:inherit;color:inherit;cursor:pointer}
      KONFIGURASI — GANTI DI SINI
      ============================================================ */
   var CONFIG = {
-    tanggal: '2026-12-12T08:00:00+07:00',   // untuk hitung mundur
-    acara:   'Pernikahan Leo & Lily',
-    lokasi:  'Pendopo Ageng Wijaya Kusuma, Sleman, Yogyakarta',
+    tanggal: '2026-12-12T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
+    acara:   'Pemberkatan & Resepsi Pernikahan Leo & Lily',
+    lokasi:  'GKMI Pemuda, Jl. Pemuda No. 75, Semarang',
     volume:  0.55,
-	musik:   'musik/lagu.mp3',
+    musik:   'musik/lagu.mp3',
 
-    /* Tempel URL Web App dari Google Apps Script di sini
-       (lihat berkas rsvp-google-apps-script.gs).
-       Biarkan kosong -> form hanya tampil lokal, tidak tersimpan. */
+    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
 
-    /* Token bersama. Samakan persis dengan TOKEN di Apps Script.
-       Ini TIDAK rahasia (terbaca di source), fungsinya hanya menyaring
-       bot dan skrip otomatis yang menembak endpoint secara acak. */
+    /* Samakan PERSIS dengan TOKEN di Apps Script.
+       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'leolily-2026-created-by-at41man'
   };
+  /* ============================================================ */
 
   var MULAI = Date.now();
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-  /* ---------- Nama tamu dari URL: ?to=Budi%20Santoso ---------- */
-	var TAMU = (function(){
+  /* ---------- Nama tamu dari URL ----------
+     Semua bentuk ini menghasilkan "Budi Santoso & Family":
+       ?to=budi-santoso-&-family
+       ?to=Budi%20Santoso%20%26%20Family
+       ?to=Budi+Santoso+%26+Family
+     Nama dipasang lewat textContent, jadi tag HTML dalam URL tidak dieksekusi. */
+  var TAMU = (function(){
     try{
       var s = location.search.replace(/^\?/, '');
       // Ambil SELURUH sisa string setelah to= / u= supaya karakter &
@@ -691,7 +608,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     playMusic();
   });
 
-  /* ---------- Reveal saat scroll (hemat: unobserve setelah tampil) ---------- */
+  /* ---------- Reveal saat scroll (unobserve setelah tampil) ---------- */
   var items = $$('.rv');
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
@@ -728,71 +645,60 @@ button{font:inherit;color:inherit;cursor:pointer}
   $('#calBtn').addEventListener('click', function(){
     function fmt(d){ return d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z'; }
     var start = new Date(CONFIG.tanggal);
-    var end   = new Date(start.getTime() + 6*3600*1000);
+    var end   = new Date(start.getTime() + 10*3600*1000);   // sampai selesai resepsi
     var ics = ['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
       'DTSTART:'+fmt(start),'DTEND:'+fmt(end),
       'SUMMARY:'+CONFIG.acara,'LOCATION:'+CONFIG.lokasi,
       'END:VEVENT','END:VCALENDAR'].join('\r\n');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
-    a.download = 'undangan-pernikahan.ics';
+    a.download = 'pernikahan-leo-lily.ics';
     a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   });
 
-  /* ---------- Salin nomor rekening ---------- */
-  $$('.copy').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var no = btn.parentNode.querySelector('[data-acc]').getAttribute('data-acc');
-      var done = function(){
-        var old = btn.textContent; btn.textContent = 'Tersalin';
-        setTimeout(function(){ btn.textContent = old; }, 1600);
-      };
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(no).then(done, done);
-      }else{
-        var t = document.createElement('textarea');
-        t.value = no; document.body.appendChild(t); t.select();
-        try{ document.execCommand('copy'); }catch(e){}
-        document.body.removeChild(t); done();
-      }
-    });
-  });
-
-  /* ---------- Ucapan (tampil di halaman, belum tersimpan ke server) ---------- */
-  var wishes = [
-    { n:'Dimas & Sekar', s:'Hadir', m:'Selamat menempuh hidup baru, Leo & Lily. Kiranya Tuhan memberkati rumah tangga kalian selalu.' },
-    { n:'Keluarga Prasetyo', s:'Hadir', m:'Turut berbahagia atas pernikahan kalian. Sampai jumpa di hari bahagia!' }
-  ];
+  /* ---------- Ucapan yang tampil di halaman ----------
+     Hanya ucapan dari sesi ini. Semua kiriman tetap tersimpan di
+     Google Sheets; daftar ini sekadar umpan balik untuk tamu. */
+  var wishes = [];
   function renderWishes(){
-    $('#wishes').innerHTML = wishes.map(function(w){
-      return '<div class="wish"><p class="wish__n"></p><p class="wish__s"></p><p class="wish__m"></p></div>';
-    }).join('');
-    $$('#wishes .wish').forEach(function(el,i){
-      el.querySelector('.wish__n').textContent = wishes[i].n;
-      el.querySelector('.wish__s').textContent = wishes[i].s;
-      el.querySelector('.wish__m').textContent = wishes[i].m;
+    var box = $('#wishes');
+    box.innerHTML = '';
+    wishes.forEach(function(w){
+      var el = document.createElement('div');
+      el.className = 'wish';
+      el.innerHTML = '<p class="wish__n"></p><p class="wish__s"></p><p class="wish__m"></p>';
+      el.querySelector('.wish__n').textContent = w.n;
+      el.querySelector('.wish__s').textContent = w.s;
+      el.querySelector('.wish__m').textContent = w.m;
+      box.appendChild(el);
     });
   }
-  renderWishes();
 
-  /* sembunyikan 'jumlah yang hadir' bila tamu memilih berhalangan */
+  /* ---------- RSVP ---------- */
   $('#gAttend').addEventListener('change', function(e){
     $('#fieldJumlah').style.display = (e.target.value === 'Berhalangan') ? 'none' : 'block';
   });
 
   var btnSend = $('#sendWish');
+  var note    = $('#wishNote');
+
+  function tulisNote(teks, kelas){
+    note.className = 'hint' + (kelas ? ' ' + kelas : '');
+    note.textContent = teks;
+  }
+
   btnSend.addEventListener('click', function(){
     var nama   = $('#gName').value.trim();
     var status = $('#gAttend').value;
     var jumlah = (status === 'Berhalangan') ? 0 : parseInt($('#gCount').value, 10);
     var pesan  = $('#gMsg').value.trim();
 
-    if(!nama){ $('#wishNote').textContent = 'Mohon isi nama terlebih dahulu.'; return; }
+    if(!nama){ tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return; }
 
     btnSend.disabled = true;
     btnSend.textContent = 'Mengirim…';
-    $('#wishNote').textContent = '';
+    tulisNote('');
 
     var data = {
       nama: nama, kehadiran: status, jumlah: jumlah, ucapan: pesan,
@@ -803,28 +709,56 @@ button{font:inherit;color:inherit;cursor:pointer}
       dwell: Math.round((Date.now() - MULAI)/1000)  // detik sejak halaman dibuka
     };
 
-    function selesai(ok){
-      btnSend.disabled = false;
-      btnSend.textContent = 'Kirim Konfirmasi';
-      if(ok){
-        if(pesan){ wishes.unshift({ n:nama, s:status, m:pesan }); renderWishes(); }
-        $('#gName').value = ''; $('#gMsg').value = '';
-        $('#wishNote').textContent = (status === 'Berhalangan')
-          ? 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.'
-          : 'Terima kasih, konfirmasi Anda sudah kami terima. Sampai jumpa di hari bahagia!';
-      }else{
-        $('#wishNote').textContent = 'Maaf, pengiriman gagal. Mohon periksa koneksi lalu coba lagi.';
+    function kalimat(res){
+      if(status === 'Berhalangan'){
+        return 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
       }
+      if(res && res.status === 'penuh'){
+        return 'Mohon maaf, kuota resepsi sudah terpenuhi. Nama Anda kami masukkan ke daftar tunggu dan akan kami hubungi bila ada kursi yang tersedia.';
+      }
+      if(res && res.status === 'sebagian'){
+        return 'Kursi yang tersisa tinggal ' + res.dicatat + '. Konfirmasi Anda kami catat untuk jumlah tersebut — silakan hubungi kami langsung bila perlu tambahan.';
+      }
+      if(res && res.diperbarui){
+        return 'Konfirmasi Anda sudah diperbarui. Sampai jumpa di hari bahagia!';
+      }
+      return 'Terima kasih, konfirmasi Anda sudah kami terima. Sampai jumpa di hari bahagia!';
     }
 
-    if(!CONFIG.rsvpEndpoint){ selesai(true); return; }
+    function selesai(res){
+      btnSend.disabled = false;
+      btnSend.textContent = 'Kirim Konfirmasi';
 
+      if(res === false){
+        tulisNote('Maaf, pengiriman gagal. Mohon periksa koneksi lalu coba lagi.', 'hint--warn');
+        return;
+      }
+      if(pesan){ wishes.unshift({ n:nama, s:status, m:pesan }); renderWishes(); }
+      $('#gMsg').value = '';
+      tulisNote(kalimat(res), (res && res.status === 'penuh') ? 'hint--warn' : 'hint--ok');
+    }
+
+    if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
+
+    /* Percobaan pertama membaca balasan server supaya pesannya spesifik
+       (kuota penuh / dipangkas / diperbarui). Bila browser memblokir
+       pembacaan lintas domain, kiriman diulang dalam mode buta.
+       Pengulangan aman: Apps Script menimpa baris tamu yang sama,
+       bukan menambah baris baru. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
-    }).then(function(){ selesai(true); }, function(){ selesai(false); });
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){ selesai(res && res.ok === false ? false : res); })
+    .catch(function(){
+      fetch(CONFIG.rsvpEndpoint, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data)
+      }).then(function(){ selesai(null); }, function(){ selesai(false); });
+    });
   });
 
   /* ---------- MUSIK LATAR ---------- */
@@ -846,7 +780,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
-  /* Video galeri: begitu tamu menekan play, musik latar otomatis berhenti,
+  /* Video galeri: begitu tamu menekan play, musik latar berhenti,
      lalu lanjut sendiri setelah video dijeda atau habis. */
   var video = $('#galeriVideo');
   if(video){
