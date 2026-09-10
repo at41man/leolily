@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
-<meta name="description" content="Wedding Invitation Leo & Lily — Sabtu, 12 Desember 2026.">
+<meta name="description" content="Wedding Invitation Leo & Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
 
 <!--
@@ -168,22 +168,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---------- COVER ---------- */
 .cover{position:fixed;inset:0;z-index:90}
 .cover__inner{position:relative;max-width:var(--app);height:100%;margin:0 auto;overflow:hidden}
-.cover__half{
-  position:absolute;left:0;right:0;height:50%;
+.cover__bg{
+  position:absolute;inset:0;
   background-color:var(--claret-deep);
   background-image:var(--cover-img,none);
-  background-repeat:no-repeat;
-  transition:transform 1.15s cubic-bezier(.66,0,.2,1);
-  will-change:transform;
+  background-size:cover;
+  background-position:center;
 }
-.cover__half--t{top:0;background-position:center top;background-size:100% 200%}
-.cover__half--b{bottom:0;background-position:center bottom;background-size:100% 200%}
-.cover__half::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,38,30,.5),rgba(22,38,30,.88))}
-.cover__seam{
-  position:absolute;left:12%;right:12%;top:50%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold-2),transparent);
-  opacity:.85;transition:opacity .5s ease;
+.cover__bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,18,15,.4),rgba(11,18,15,.82))}
+
+.blackout{
+  position:fixed;inset:0;z-index:95;background:#000;
+  opacity:0;pointer-events:none;transition:opacity .7s ease;
 }
+.blackout.is-on{opacity:1}
 .cover__body{
   position:absolute;inset:0;z-index:3;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -211,10 +209,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn[disabled]{opacity:.55;cursor:default}
 
 /* cover terbuka */
-.cover.is-open .cover__half--t{transform:translateY(-100%)}
-.cover.is-open .cover__half--b{transform:translateY(100%)}
-.cover.is-open .cover__body{opacity:0;transform:translateY(-14px);pointer-events:none}
-.cover.is-open .cover__seam{opacity:0}
+.cover.is-open .cover__body{opacity:0;transform:scale(1.02);pointer-events:none}
 .cover.is-gone{display:none}
 
 /* ---------- HERO ---------- */
@@ -312,14 +307,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 <!-- =================== SAMPUL =================== -->
 <div class="cover" id="cover" style="--cover-img:url('foto/0.jpg')">
   <div class="cover__inner">
-    <div class="cover__half cover__half--t"></div>
-    <div class="cover__half cover__half--b"></div>
-    <div class="cover__seam"></div>
+    <div class="cover__bg"></div>
 
     <div class="cover__body">
       <p class="eyebrow">The Wedding of</p>
       <h1 class="cover__names">Leo<span class="cover__amp">&amp;</span>Lily</h1>
-      <p class="cover__date">Sabtu · 12 Desember 2026</p>
+      <p class="cover__date">Sabtu · 7 November 2026</p>
 
       <p class="cover__to">Kepada Bapak/Ibu/Saudara/i</p>
       <p class="cover__guest" id="guestName">Tamu Undangan</p>
@@ -341,7 +334,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <p class="eyebrow">Undangan Pernikahan</p>
       <h1 class="h-display hero__names">Leo<span class="hero__amp">and</span>Lily</h1>
       <div class="rule" style="height:34px"></div>
-      <p class="cover__date" style="color:var(--ink-soft)">12 · 12 · 2026</p>
+      <p class="cover__date" style="color:var(--ink-soft)">07 · 11 · 2026</p>
     </div>
   </section>
 
@@ -394,7 +387,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <!-- HITUNG MUNDUR -->
   <section class="sec sec--dark">
     <p class="eyebrow rv" style="color:var(--gold-2)">Save the Date</p>
-    <h2 class="h-sec rv">Sabtu, 12 Desember 2026</h2>
+    <h2 class="h-sec rv">Sabtu, 7 November 2026</h2>
     <div class="count rv rv-2" id="countdown">
       <div class="count__cell"><div class="count__n" data-c="d">—</div><div class="count__l">Hari</div></div>
       <div class="count__cell"><div class="count__n" data-c="h">—</div><div class="count__l">Jam</div></div>
@@ -485,7 +478,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="eyebrow rv">RSVP</p>
     <h2 class="h-sec rv" style="margin-bottom:8px">Konfirmasi Kehadiran</h2>
     <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerja sama Bapak/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
-    <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 30 November 2026</p>
+    <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 25 Oktober 2026</p>
 
     <div class="rv rv-2">
       <div class="field">
@@ -553,6 +546,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <audio id="bgm" loop preload="none"></audio>
 
+<div class="blackout" id="blackout"></div>
+
 <script>
 (function(){
   'use strict';
@@ -561,7 +556,7 @@ button{font:inherit;color:inherit;cursor:pointer}
      KONFIGURASI — GANTI DI SINI
      ============================================================ */
   var CONFIG = {
-    tanggal: '2026-12-12T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
+    tanggal: '2026-11-07T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
     acara:   'Pemberkatan & Resepsi Pernikahan Leo & Lily',
     lokasi:  'GKMI Pemuda, Jl. Pemuda No. 75, Semarang',
     volume:  0.55,
@@ -609,15 +604,24 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(isiNama && !isiNama.value){ isiNama.value = TAMU; }
   }
 
-  /* ---------- Buka sampul ---------- */
-  var cover = $('#cover');
+  /* ---------- Buka sampul: crossfade ke hitam, lalu ke dalam undangan ---------- */
+  var cover    = $('#cover');
+  var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
+    playMusic();                       // dipanggil di dalam gestur tamu
     cover.classList.add('is-open');
-    document.body.classList.remove('is-locked');
-    window.scrollTo(0,0);
-    $('#fab').hidden = false;
-    setTimeout(function(){ cover.classList.add('is-gone'); }, 1300);
-    playMusic();
+    blackout.classList.add('is-on');   // 700ms menuju gelap total
+
+    setTimeout(function(){
+      cover.classList.add('is-gone');
+      document.body.classList.remove('is-locked');
+      window.scrollTo(0,0);
+      $('#fab').hidden = false;
+      // satu frame jeda supaya layout undangan mapan sebelum disingkap
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ blackout.classList.remove('is-on'); });
+      });
+    }, 700);
   });
 
   /* ---------- Reveal saat scroll (unobserve setelah tampil) ---------- */
