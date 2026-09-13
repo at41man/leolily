@@ -519,11 +519,12 @@ button{font:inherit;color:inherit;cursor:pointer}
         <input id="gName" type="text" placeholder="Nama Anda" autocomplete="name">
       </div>
       <div class="field">
-        <label for="gAttend">Konfirmasi kehadiran</label>
-        <select id="gAttend">
-          <option value="Hadir">Hadir</option>
-          <option value="Masih ragu">Masih ragu</option>
-          <option value="Berhalangan">Berhalangan</option>
+       <label for="gAttend">Konfirmasi kehadiran</label>
+       <select id="gAttend">
+          <option value="Gereja">Gereja</option>
+          <option value="Venue">Venue</option>
+          <option value="Keduanya">Keduanya</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
         </select>
       </div>
       <div class="field" id="fieldJumlah">
@@ -637,7 +638,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     /* Samakan PERSIS dengan TOKEN di Apps Script.
        Tidak rahasia (terbaca di source) — hanya menyaring bot. */
-    rsvpToken: 'leolily-2026-created-by-at41man'
+    rsvpToken: 'at41man-leolily-2026'
   };
   /* ============================================================ */
 
@@ -760,7 +761,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- RSVP ---------- */
   $('#gAttend').addEventListener('change', function(e){
-    $('#fieldJumlah').style.display = (e.target.value === 'Berhalangan') ? 'none' : 'block';
+     $('#fieldJumlah').style.display = (e.target.value === 'Tidak hadir') ? 'none' : 'block';
   });
 
   var btnSend = $('#sendWish');
@@ -774,7 +775,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   btnSend.addEventListener('click', function(){
     var nama   = $('#gName').value.trim();
     var status = $('#gAttend').value;
-    var jumlah = (status === 'Berhalangan') ? 0 : parseInt($('#gCount').value, 10);
+    var jumlah = (status === 'Tidak hadir') ? 0 : parseInt($('#gCount').value, 10);
     var pesan  = $('#gMsg').value.trim();
 
     if(!nama){ tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return; }
@@ -793,7 +794,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     };
 
     function kalimat(res){
-      if(status === 'Berhalangan'){
+      if(status === 'Tidak hadir'){
         return 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
       }
       if(res && res.status === 'penuh'){
