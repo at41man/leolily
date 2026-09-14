@@ -761,7 +761,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- RSVP ---------- */
   $('#gAttend').addEventListener('change', function(e){
-     $('#fieldJumlah').style.display = (e.target.value === 'Tidak hadir') ? 'none' : 'block';
+     $('#fieldJumlah').style.display = (e.target.value === 'Tidak Hadir') ? 'none' : 'block';
   });
 
   var btnSend = $('#sendWish');
@@ -775,7 +775,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   btnSend.addEventListener('click', function(){
     var nama   = $('#gName').value.trim();
     var status = $('#gAttend').value;
-    var jumlah = (status === 'Tidak hadir') ? 0 : parseInt($('#gCount').value, 10);
+    var jumlah = (status === 'Tidak Hadir') ? 0 : parseInt($('#gCount').value, 10);
     var pesan  = $('#gMsg').value.trim();
 
     if(!nama){ tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return; }
@@ -794,7 +794,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     };
 
     function kalimat(res){
-      if(status === 'Tidak hadir'){
+      if(status === 'Tidak Hadir'){
         return 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
       }
       if(res && res.status === 'penuh'){
