@@ -6,7 +6,6 @@
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -286,6 +285,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 }
 .field textarea{resize:vertical;min-height:96px}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--claret)}
+.field input.is-locked{
+  background:rgba(85,120,91,.07);
+  border-style:dashed;
+  color:var(--ink);
+  cursor:default;
+}
+.field input.is-locked:focus{border-color:rgba(85,120,91,.38)}
 .hint{font-size:14px;color:var(--ink-soft);margin:12px 0 0;line-height:1.6;min-height:1px}
 .hint--ok{color:var(--claret)}
 .hint--warn{color:#8A5A2B}
@@ -514,7 +520,6 @@ button{font:inherit;color:inherit;cursor:pointer}
         <img src="foto/8.jpg" alt="Prewedding 5" loading="lazy">
       </figure>
 
-      <!-- Video: berkas di folder video/, poster di folder foto/ -->
       <figure class="ph gal__wide rv" style="--ar:16/9">
         <video id="galeriVideo" class="vid" autoplay muted loop playsinline
                preload="none" poster="foto/video-poster.jpg"
@@ -643,7 +648,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   'use strict';
 
   /* ============================================================
-     KONFIGURASI
+     KONFIGURASI — GANTI DI SINI
      ============================================================ */
   var CONFIG = {
     tanggal: '2026-11-07T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
@@ -653,8 +658,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     volume:  0.55,
     musik:   'musik/lagu.mp3',
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
-    rsvpToken: 'at41man-leolily-2026',
-    batasTunggu: 5000
+	rsvpToken: 'at41man-leolily-2026',
+	batasTunggu: 5000
   };
   /* ============================================================ */
 
@@ -667,10 +672,10 @@ button{font:inherit;color:inherit;cursor:pointer}
   })();
 
   var TAMU     = '';
-  var UNDANGAN = 'gereja';   // bawaan paling aman; dinaikkan hanya oleh server
+  var UNDANGAN = 'gereja';   
   var siapPakai = false;
   var btnBuka  = $('#openBtn');
-  var lblBuka  = btnBuka.lastChild;          // simpul teks di dalam tombol
+  var lblBuka  = btnBuka.lastChild;          
   var teksBuka = lblBuka.nodeValue;
 
   function bukaKunci(){
@@ -685,7 +690,15 @@ button{font:inherit;color:inherit;cursor:pointer}
     $('#guestTo').hidden = false;
     document.title = n + ' — Undangan Pernikahan Leo & Lily';
     var isiNama = $('#gName');
-    if(isiNama && !isiNama.value){ isiNama.value = n; }
+    if(isiNama){
+      isiNama.value = n;
+      isiNama.readOnly = true;        
+      isiNama.classList.add('is-locked');
+      isiNama.removeAttribute('placeholder');
+      isiNama.setAttribute('aria-readonly', 'true');
+      var lab = document.querySelector('label[for="gName"]');
+      if(lab){ lab.textContent = 'Nama (sesuai undangan)'; }
+    }
   }
 
   function pasangResepsi(r){
@@ -901,19 +914,31 @@ button{font:inherit;color:inherit;cursor:pointer}
     };
 
     function kalimat(res){
-      if(status === 'Tidak Hadir'){
-        return 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
+      var kini  = (res && res.tercatat) ? res.tercatat : status;
+      var orang = (res && typeof res.dicatat === 'number') ? res.dicatat : jumlah;
+
+      var awal = '';
+      if(res && res.diperbarui && res.sebelumnya && res.sebelumnya.kehadiran){
+        var sb = res.sebelumnya;
+        awal = 'Sebelumnya Anda mengonfirmasi ' + sb.kehadiran +
+               (sb.jumlah ? ' untuk ' + sb.jumlah + ' orang' : '') + '. ';
+      }
+
+      if(kini === 'Tidak Hadir'){
+        return awal + 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
       }
       if(res && res.status === 'penuh'){
-        return 'Mohon maaf, kuota resepsi sudah terpenuhi. Nama Anda kami masukkan ke daftar tunggu dan akan kami hubungi bila ada kursi yang tersedia.';
+        return awal + 'Mohon maaf, kuota resepsi sudah terpenuhi. Nama Anda kami masukkan ke daftar tunggu dan akan kami hubungi bila ada kursi yang tersedia.';
       }
       if(res && res.status === 'sebagian'){
-        return 'Kursi yang tersisa tinggal ' + res.dicatat + '. Konfirmasi Anda kami catat untuk jumlah tersebut — silakan hubungi kami langsung bila perlu tambahan.';
+        return awal + 'Kursi yang tersisa tinggal ' + orang + '. Konfirmasi Anda kami catat untuk jumlah tersebut — silakan hubungi kami langsung bila perlu tambahan.';
       }
       if(res && res.diperbarui){
-        return 'Konfirmasi Anda sudah diperbarui. Sampai jumpa di hari bahagia!';
+        return awal + 'Konfirmasi Anda kini diperbarui menjadi ' + kini +
+               (orang ? ' untuk ' + orang + ' orang' : '') + '. Sampai jumpa di hari bahagia!';
       }
-      return 'Terima kasih, konfirmasi Anda sudah kami terima. Sampai jumpa di hari bahagia!';
+      return 'Terima kasih, konfirmasi Anda kami terima: ' + kini +
+             (orang ? ' untuk ' + orang + ' orang' : '') + '. Sampai jumpa di hari bahagia!';
     }
 
     function selesai(res){
@@ -1007,8 +1032,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
-  /* Video galeri: berputar sendiri tanpa suara saat terlihat di layar,
-     berhenti saat keluar layar. Berkasnya baru diunduh ketika dibutuhkan. */
   var video    = $('#galeriVideo');
   var vidSound = $('#vidSound');
 
@@ -1032,8 +1055,6 @@ button{font:inherit;color:inherit;cursor:pointer}
       mainkanVideo();
     }
 
-    /* Tombol suara. Video bersuara -> musik latar berhenti,
-       lalu lanjut lagi begitu video dibisukan kembali. */
     if(vidSound){
       vidSound.addEventListener('click', function(){
         video.muted = !video.muted;
