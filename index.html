@@ -6,6 +6,34 @@
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
+
+<!--
+==================================================================
+  UNDANGAN PERNIKAHAN LEO & LILY
+
+  BENTUK TAUTAN
+    ?k=a3f9c2b18e0d   kode pribadi tiap tamu, dibuat di spreadsheet
+    tanpa parameter   undangan gereja umum, tanpa nama
+
+  Berkas ini TIDAK memuat daftar tamu, kode, maupun detail resepsi.
+  Semuanya ditanyakan ke Apps Script saat halaman dibuka. Membuka
+  F12 di sini tidak memperlihatkan apa pun tentang venue.
+
+  YANG PERLU DIISI — semuanya di blok CONFIG dalam skrip di bawah.
+==================================================================
+-->
+
+<script>
+/* Penjaga pintu. Tanpa kode undangan yang berbentuk sah, pengunjung
+   dialihkan ke galeri sebelum satu piksel pun undangan sempat tampil.
+   Sengaja diletakkan di <head> dan tanpa dependensi apa pun. */
+(function(){
+  if(!/[?&]k=[A-Za-z0-9]{4,40}(?:&|$)/.test(location.search)){
+    location.replace('gallery.html');
+  }
+})();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -170,6 +198,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .cover__date{font-family:var(--f-util);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(234,242,231,.85)}
 .cover__to{margin-top:30px;font-size:15px;color:rgba(234,242,231,.7)}
 .cover__guest{font-family:var(--f-display);font-size:26px;color:var(--gold-2);margin:2px 0 22px}
+.cover__pesan{
+  max-width:30ch;margin:0 auto 22px;font-size:15.5px;line-height:1.6;
+  color:rgba(234,242,231,.78);
+}
 
 .btn{
   display:inline-flex;align-items:center;gap:10px;
@@ -401,6 +433,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
       <p class="cover__to" id="guestTo" hidden>Kepada Bapak/Ibu/Saudara/i</p>
       <p class="cover__guest" id="guestName"></p>
+      <p class="cover__pesan" id="coverPesan" hidden></p>
 
       <button class="btn" id="openBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="15" height="15"><rect x="2.5" y="5" width="19" height="14" rx="1"/><path d="M2.5 6l9.5 7 9.5-7"/></svg>
@@ -509,7 +542,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </div>
 
-
+    <!-- Kartu resepsi disisipkan oleh skrip, hanya untuk kode ber-Jenis venue -->
   </section>
 
   <!-- GALERI -->
@@ -541,6 +574,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <img src="foto/8.jpg" alt="Prewedding 5" loading="lazy">
       </figure>
 
+      <!-- Video: berkas di folder video/, poster di folder foto/ -->
       <figure class="ph gal__wide rv" style="--ar:16/9">
         <video id="galeriVideo" class="vid" autoplay muted loop playsinline
                preload="none" poster="foto/video-poster.jpg"
@@ -557,6 +591,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <section class="sec sec--tint">
     <p class="eyebrow rv">RSVP</p>
     <h2 class="h-sec rv" style="margin-bottom:8px">Konfirmasi Kehadiran</h2>
+    <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerja sama Bapak/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
     <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 25 Oktober 2026</p>
 
     <div class="rv rv-2">
@@ -585,14 +620,12 @@ button{font:inherit;color:inherit;cursor:pointer}
         <textarea id="gMsg" placeholder="Tulis ucapan dan doa Anda…"></textarea>
       </div>
 
-
+      <!-- Honeypot: tak terlihat manusia, tapi bot cenderung mengisinya. Jangan dihapus. -->
       <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
         <label for="gSite">Website</label>
         <input id="gSite" type="text" tabindex="-1" autocomplete="off">
       </div>
-	
-		<p class="hint" id="catatanKirim" style="margin:0 0 16px">Mohon diperiksa kembali sebelum mengirim.</p>
-		
+
       <button class="btn btn--solid" type="button" id="sendWish">Kirim Konfirmasi</button>
       <p class="hint" id="wishNote" role="status" aria-live="polite"></p>
     </div>
@@ -681,10 +714,21 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
+
+    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
+
+    /* Samakan PERSIS dengan TOKEN di Apps Script.
+       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
+
+    /* Berapa lama menunggu jawaban server sebelum menyerah (ms).
+       Kalau lewat, tamu tetap melihat undangan gereja. */
     batasTunggu: 5000,
-    kontakWA: ''
+
+    /* Nomor WhatsApp untuk tamu yang perlu mengubah konfirmasi.
+       Format internasional tanpa tanda plus. Kosongkan bila tidak dipakai. */
+    kontakWA: '6281234567890'
   };
   /* ============================================================ */
 
@@ -692,25 +736,42 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-
+  /* ---------- Kode tamu dari URL ----------
+     Yang dibaca hanya ?k=KODE. Nama, jenis undangan, dan detail resepsi
+     semuanya datang dari Apps Script, bukan dari tautan. */
   var KODE = (function(){
     var m = location.search.match(/[?&]k=([A-Za-z0-9]{4,40})(?:&|$)/);
     return m ? m[1].toLowerCase() : '';
   })();
 
   var TAMU     = '';
-  var SUDAH    = null;        
-  var UNDANGAN = 'gereja';   
+  var SUDAH    = null;        // jawaban RSVP yang sudah tersimpan, bila ada
+  var UNDANGAN = 'gereja';   // bawaan paling aman; dinaikkan hanya oleh server
   var siapPakai = false;
 
+  /* Tombol Buka Undangan dikunci sampai server menjawab, supaya tamu tidak
+     pernah melihat nama atau isi undangan berubah di depan matanya. */
   var btnBuka  = $('#openBtn');
-  var lblBuka  = btnBuka.lastChild;          
+  var lblBuka  = btnBuka.lastChild;          // simpul teks di dalam tombol
   var teksBuka = lblBuka.nodeValue;
 
   function bukaKunci(){
     siapPakai = true;
     btnBuka.disabled = false;
     lblBuka.nodeValue = teksBuka;
+  }
+
+  /* Kode ada, tapi server tidak menjawab. Undangan TIDAK dibuka dengan isi
+     yang mungkin salah — tamu diberi jalan memuat ulang. */
+  var MODE_ULANG = false;
+  function gagalMuat(){
+    if(siapPakai || MODE_ULANG) return;
+    MODE_ULANG = true;
+    var p = $('#coverPesan');
+    p.hidden = false;
+    p.textContent = 'Undangan belum dapat dimuat. Mohon periksa koneksi Anda, lalu muat ulang.';
+    btnBuka.disabled = false;
+    lblBuka.nodeValue = ' Muat Ulang';
   }
 
   function pasangNama(n){
@@ -721,7 +782,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     var isiNama = $('#gName');
     if(isiNama){
       isiNama.value = n;
-      isiNama.readOnly = true;        
+      isiNama.readOnly = true;        // nama datang dari daftar tamu, bukan ketikan
       isiNama.classList.add('is-locked');
       isiNama.removeAttribute('placeholder');
       isiNama.setAttribute('aria-readonly', 'true');
@@ -730,6 +791,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
   }
 
+  /* Bangun kartu resepsi dari data server. Tidak ada satu pun detailnya
+     yang tertulis di berkas ini. */
   function pasangResepsi(r){
     if(!r || $('#kartuResepsi')) return;
     var d = document.createElement('div');
@@ -782,6 +845,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   terapkanGereja();
 
+  /* Konfirmasi hanya bisa dikirim SEKALI. Begitu jawaban tersimpan,
+     formulir dikunci dan yang tampil adalah ringkasan jawabannya. */
   function kunciFormulir(r){
     SUDAH = r;
 
@@ -808,7 +873,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       ket.appendChild(document.createTextNode(' agar dapat kami sesuaikan.'));
     }else{
       ket.appendChild(document.createTextNode(
-        ''));
+        'Bila ada perubahan, mohon hubungi kami langsung agar dapat kami sesuaikan.'));
     }
 
     // Semua isian dimatikan, tombol kirim dilepas dari halaman
@@ -817,13 +882,11 @@ button{font:inherit;color:inherit;cursor:pointer}
       if(el){ el.disabled = true; el.classList.add('is-locked'); }
     });
     var fj = $('#fieldJumlah'); if(fj){ fj.style.display = 'none'; }
-	var ck = $('#catatanKirim');
-    if(ck && ck.parentNode){ ck.parentNode.removeChild(ck); }
-    if(btnSend && btnSend.parentNode){ btnSend.parentNode.removeChild(btnSend); }
     if(btnSend && btnSend.parentNode){ btnSend.parentNode.removeChild(btnSend); }
   }
 
-
+  /* Tanya server. JSONP dipakai supaya lolos pembatasan lintas domain
+     tanpa bergantung pada perilaku CORS Apps Script yang tidak dijamin. */
   (function cariTamu(){
     if(!KODE || !CONFIG.rsvpEndpoint){ siapPakai = true; return; }
 
@@ -832,41 +895,50 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     var cb = 'cbTamu' + Math.floor(Math.random() * 1e9);
     var sc = document.createElement('script');
-    var beres = false;
+    var dijawab = false, beres = false;
 
-    function selesai(){
+    function bersihkan(){
       if(beres) return;
       beres = true;
-      bukaKunci();                  // apa pun hasilnya, tamu tidak dibiarkan terkunci
       try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
       if(sc.parentNode) sc.parentNode.removeChild(sc);
     }
 
     window[cb] = function(res){
-      if(res && res.ok){
-        if(res.nama) pasangNama(res.nama);
-        if(res.jenis === 'venue' && res.resepsi){
-          UNDANGAN = 'utama';
-          $('#heroLabel').textContent = 'Undangan Pernikahan';
-          CONFIG.acara     = 'Pemberkatan & Resepsi Pernikahan Leo & Lily';
-          CONFIG.durasiJam = 10;
-          pasangResepsi(res.resepsi);
-        }
-        if(res.rsvp && res.rsvp.kehadiran){ kunciFormulir(res.rsvp); }
+      dijawab = true;
+
+      // Kode tidak terdaftar atau sudah dicabut -> bukan tamu undangan
+      if(!res || !res.ok){ bersihkan(); location.replace('gallery.html'); return; }
+
+      if(res.nama) pasangNama(res.nama);
+      if(res.jenis === 'venue' && res.resepsi){
+        UNDANGAN = 'utama';
+        $('#heroLabel').textContent = 'Undangan Pernikahan';
+        CONFIG.acara     = 'Pemberkatan & Resepsi Pernikahan Leo & Lily';
+        CONFIG.durasiJam = 10;
+        pasangResepsi(res.resepsi);
       }
-      selesai();
+      if(res.rsvp && res.rsvp.kehadiran){ kunciFormulir(res.rsvp); }
+
+      bersihkan();
+      bukaKunci();
     };
 
+    sc.onerror = function(){ bersihkan(); gagalMuat(); };
     sc.src = CONFIG.rsvpEndpoint + '?k=' + encodeURIComponent(KODE) + '&cb=' + cb;
-    sc.onerror = selesai;
     document.head.appendChild(sc);
-    setTimeout(selesai, CONFIG.batasTunggu);
+
+    setTimeout(function(){
+      if(dijawab) return;
+      bersihkan(); gagalMuat();
+    }, CONFIG.batasTunggu);
   })();
 
   /* ---------- Buka sampul: crossfade ke hitam, lalu ke dalam undangan ---------- */
   var cover    = $('#cover');
   var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
+    if(MODE_ULANG){ location.reload(); return; }
     if(!siapPakai) return;             // tombol memang terkunci; jaga-jaga saja
     playMusic();                       // dipanggil di dalam gestur tamu
     cover.classList.add('is-open');
@@ -981,8 +1053,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       kode: KODE,
       sumber: UNDANGAN,
       token: CONFIG.rsvpToken,
-      hp: $('#gSite').value,                       
-      dwell: Math.round((Date.now() - MULAI)/1000)  
+      hp: $('#gSite').value,                        // honeypot, harus kosong
+      dwell: Math.round((Date.now() - MULAI)/1000)  // detik sejak halaman dibuka
     };
 
     function kalimat(res){
@@ -1027,6 +1099,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
 
+    /* Percobaan pertama membaca balasan server supaya pesannya spesifik.
+       Bila browser memblokir pembacaan lintas domain, kiriman diulang
+       dalam mode buta. Aman: Apps Script menimpa baris tamu yang sama. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1044,7 +1119,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
 
   btnSend.addEventListener('click', function(){
-    if(SUDAH){ return; }                
+    if(SUDAH){ return; }                 // sudah terkunci, tidak ada yang dikirim
     if(!$('#gName').value.trim()){
       tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return;
     }
@@ -1111,6 +1186,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
+  /* Video galeri: berputar sendiri tanpa suara saat terlihat di layar,
+     berhenti saat keluar layar. Berkasnya baru diunduh ketika dibutuhkan. */
   var video    = $('#galeriVideo');
   var vidSound = $('#vidSound');
 
