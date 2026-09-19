@@ -240,12 +240,91 @@ button{font:inherit;color:inherit;cursor:pointer}
 .count__l{font-family:var(--f-util);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,240,230,.6);margin-top:8px}
 
 /* ---------- ACARA ---------- */
-.event{border:1px solid rgba(85,120,91,.3);padding:clamp(26px,7vw,36px) 20px;background:var(--paper)}
-.event + .event{margin-top:20px}
-.event__t{font-family:var(--f-display);font-size:27px;color:var(--claret);margin:14px 0 12px}
-.event__row{font-size:16.5px;color:var(--ink-soft);margin:0}
-.event__row strong{color:var(--ink);font-weight:500}
-.event__hr{width:44px;height:1px;background:rgba(85,120,91,.45);margin:16px auto}
+.event{
+  border:1px solid rgba(85,120,91,.3);
+  padding:clamp(30px,8vw,40px) 20px clamp(28px,7vw,34px);
+  background:var(--paper);
+  position:relative;
+}
+.event + .event{margin-top:22px}
+
+.event__t{
+  font-family:var(--f-display);
+  font-size:clamp(23px,6vw,27px);
+  line-height:1.25;
+  color:var(--claret);
+  margin:14px 0 20px;
+}
+
+/* Jam — elemen paling menonjol di kartu */
+.event__time{
+  font-family:var(--f-display);
+  font-size:clamp(46px,13vw,58px);
+  line-height:1;
+  color:var(--claret);
+  margin:0;
+  letter-spacing:.01em;
+}
+.event__time span{
+  display:inline-block;
+  font-family:var(--f-util);
+  font-size:13px;
+  letter-spacing:.22em;
+  vertical-align:middle;
+  margin-left:8px;
+  color:var(--gold);
+}
+.event__day{
+  font-family:var(--f-util);
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin:0 0 12px;
+}
+
+.event__hr{width:44px;height:1px;background:rgba(85,120,91,.45);margin:24px auto}
+
+.event__venue{
+  font-family:var(--f-display);
+  font-size:clamp(19px,5vw,22px);
+  line-height:1.35;
+  color:var(--ink);
+  margin:0 0 8px;
+}
+.event__addr{
+  font-size:16px;
+  line-height:1.6;
+  color:var(--ink-soft);
+  max-width:30ch;
+  margin:0 auto;
+}
+
+.event{text-align:center}
+.event__t,.event__day,.event__time,.event__venue{margin-inline:auto}
+
+/* Kartu acara bernuansa hijau */
+.event{
+  background-color:var(--claret-deep);
+  background-image:radial-gradient(110% 80% at 50% 0%,rgba(126,168,131,.22),transparent 72%);
+  border-color:rgba(198,219,195,.22);
+  color:#E8F0E6;
+}
+.event .orn{color:var(--gold-2);opacity:.75}
+.event__t{color:var(--gold-2)}
+.event__time{color:#FBFDF9}
+.event__time span{color:var(--gold-2)}
+.event__venue{color:#EAF2E7}
+.event__addr{color:rgba(232,240,230,.68)}
+.event__hr{background:rgba(198,219,195,.35)}
+.event .btn--ghost{border-color:rgba(198,219,195,.45);color:var(--gold-2)}
+.event .btn--ghost:hover,.event .btn--ghost:focus-visible{
+  background:var(--gold-2);border-color:var(--gold-2);color:#12211A;
+  
+  .event__t{margin:14px 0 22px}
+.event__hr{margin:22px auto 20px}
+.event__time{margin:0}
+}
 
 /* ---------- GALERI ---------- */
 .gal{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-inline:var(--edge)}
@@ -440,29 +519,37 @@ button{font:inherit;color:inherit;cursor:pointer}
   </section>
 
   <!-- ACARA -->
-  <section class="sec sec--tint">
-    <p class="eyebrow rv">Rangkaian Acara</p>
-    <h2 class="h-sec rv" style="margin-bottom:36px">Waktu &amp; Tempat</h2>
-
     <div class="event rv">
       <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
-      <h3 class="event__t">Ibadah Pemberkatan Pernikahan</h3>
-      <p class="event__row"><strong>10:30 WIB</strong></p>
+      <h3 class="event__t">Pemberkatan Pernikahan</h3>
+
+      <p class="event__venue">Gereja Kristen Muria Indonesia<br>(GKMI) Pemuda</p>
+      <p class="event__addr">Jl. Pemuda No. 75, Semarang</p>
+
       <div class="event__hr"></div>
-      <p class="event__row">Gereja Kristen Muria Indonesia (GKMI) Pemuda<br>Jl. Pemuda No. 75<br>Semarang</p>
+
+      <p class="event__time">10.30<span>WIB</span></p>
+
+      <div style="margin-top:26px">
+        <a class="btn btn--ghost" href="https://maps.app.goo.gl/ZQq83Nx9c7E2E3Pe8" target="_blank" rel="noopener">Lihat Lokasi</a>
+      </div>
     </div>
 
     <div class="event rv rv-2">
       <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
       <h3 class="event__t">Resepsi Pernikahan</h3>
-      <p class="event__row"><strong>18:00 WIB</strong></p>
+
+      <p class="event__venue">Palace Fine Cuisine Ballroom</p>
+      <p class="event__addr">Ruang Mahogany, Lantai 3<br>Jl. MH Thamrin No. 5, Semarang</p>
+
       <div class="event__hr"></div>
-      <p class="event__row">Palace Fine Cuisine Ballroom<br>Ruang Mahogany, Lantai 3<br>Jl. MH Thamrin No. 5, Semarang</p>
-      <div style="margin-top:22px">
+
+      <p class="event__time">18.00<span>WIB</span></p>
+
+      <div style="margin-top:26px">
         <a class="btn btn--ghost" href="https://maps.app.goo.gl/YPZWsgvHtVnJNmGaA" target="_blank" rel="noopener">Lihat Lokasi</a>
       </div>
     </div>
-  </section>
 
   <!-- GALERI -->
   <section class="sec sec--flush">
