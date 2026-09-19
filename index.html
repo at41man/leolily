@@ -6,6 +6,7 @@
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -371,8 +372,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       <h1 class="cover__names">Leo<span class="cover__amp">&amp;</span>Lily</h1>
       <p class="cover__date">Sabtu · 7 November 2026</p>
 
-      <p class="cover__to">Kepada Bapak/Ibu/Saudara/i</p>
-      <p class="cover__guest" id="guestName">Tamu Undangan</p>
+      <p class="cover__to" id="guestTo" hidden>Kepada Bapak/Ibu/Saudara/i</p>
+      <p class="cover__guest" id="guestName"></p>
 
       <button class="btn" id="openBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="15" height="15"><rect x="2.5" y="5" width="19" height="14" rx="1"/><path d="M2.5 6l9.5 7 9.5-7"/></svg>
@@ -642,7 +643,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   'use strict';
 
   /* ============================================================
-     KONFIGURASI — GANTI DI SINI
+     KONFIGURASI
      ============================================================ */
   var CONFIG = {
     tanggal: '2026-11-07T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
@@ -651,27 +652,15 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
-
-    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
-
-    /* Samakan PERSIS dengan TOKEN di Apps Script.
-       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
-
-    /* Berapa lama menunggu jawaban server sebelum menyerah (ms).
-       Kalau lewat, tamu tetap melihat undangan gereja. */
-    batasTunggu: 8000
+    batasTunggu: 5000
   };
   /* ============================================================ */
 
   var MULAI = Date.now();
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
-
-  /* ---------- Kode tamu dari URL ----------
-     Yang dibaca hanya ?k=KODE. Nama, jenis undangan, dan detail resepsi
-     semuanya datang dari Apps Script, bukan dari tautan. */
   var KODE = (function(){
     var m = location.search.match(/[?&]k=([A-Za-z0-9]{4,40})(?:&|$)/);
     return m ? m[1].toLowerCase() : '';
@@ -680,17 +669,25 @@ button{font:inherit;color:inherit;cursor:pointer}
   var TAMU     = '';
   var UNDANGAN = 'gereja';   // bawaan paling aman; dinaikkan hanya oleh server
   var siapPakai = false;
+  var btnBuka  = $('#openBtn');
+  var lblBuka  = btnBuka.lastChild;          // simpul teks di dalam tombol
+  var teksBuka = lblBuka.nodeValue;
+
+  function bukaKunci(){
+    siapPakai = true;
+    btnBuka.disabled = false;
+    lblBuka.nodeValue = teksBuka;
+  }
 
   function pasangNama(n){
     TAMU = n;
     $('#guestName').textContent = n;
+    $('#guestTo').hidden = false;
     document.title = n + ' — Undangan Pernikahan Leo & Lily';
     var isiNama = $('#gName');
     if(isiNama && !isiNama.value){ isiNama.value = n; }
   }
 
-  /* Bangun kartu resepsi dari data server. Tidak ada satu pun detailnya
-     yang tertulis di berkas ini. */
   function pasangResepsi(r){
     if(!r || $('#kartuResepsi')) return;
     var d = document.createElement('div');
@@ -743,10 +740,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   terapkanGereja();
 
-  /* Tanya server. JSONP dipakai supaya lolos pembatasan lintas domain
-     tanpa bergantung pada perilaku CORS Apps Script yang tidak dijamin. */
   (function cariTamu(){
     if(!KODE || !CONFIG.rsvpEndpoint){ siapPakai = true; return; }
+
+    btnBuka.disabled = true;
+    lblBuka.nodeValue = ' Memuat…';
 
     var cb = 'cbTamu' + Math.floor(Math.random() * 1e9);
     var sc = document.createElement('script');
@@ -754,7 +752,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     function selesai(){
       if(beres) return;
-      beres = true; siapPakai = true;
+      beres = true;
+      bukaKunci();                  // apa pun hasilnya, tamu tidak dibiarkan terkunci
       try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
       if(sc.parentNode) sc.parentNode.removeChild(sc);
     }
@@ -783,28 +782,8 @@ button{font:inherit;color:inherit;cursor:pointer}
   var cover    = $('#cover');
   var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
+    if(!siapPakai) return;             // tombol memang terkunci; jaga-jaga saja
     playMusic();                       // dipanggil di dalam gestur tamu
-
-    // Bila jawaban server belum tiba, tunggu sebentar supaya tamu tidak
-    // melihat undangan yang isinya berubah di depan matanya.
-    if(!siapPakai){
-      var btn = $('#openBtn');
-      btn.disabled = true;
-      var label = btn.lastChild;
-      var teksAsli = label.nodeValue;
-      label.nodeValue = ' Memuat…';
-      var mulai = Date.now();
-      var tunggu = setInterval(function(){
-        if(siapPakai || Date.now() - mulai > CONFIG.batasTunggu){
-          clearInterval(tunggu);
-          btn.disabled = false;
-          label.nodeValue = teksAsli;
-          btn.click();
-        }
-      }, 120);
-      return;
-    }
-
     cover.classList.add('is-open');
     blackout.classList.add('is-on');   // 700ms menuju gelap total
 
@@ -952,9 +931,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
 
-    /* Percobaan pertama membaca balasan server supaya pesannya spesifik.
-       Bila browser memblokir pembacaan lintas domain, kiriman diulang
-       dalam mode buta. Aman: Apps Script menimpa baris tamu yang sama. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
