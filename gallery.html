@@ -7,20 +7,6 @@
 <meta name="description" content="Galeri foto Leo &amp; Lily.">
 <meta name="theme-color" content="#0F1C16">
 <meta name="robots" content="noindex">
-
-<!--
-==================================================================
-  GALERI 3D — dinding foto yang mengikuti kemiringan perangkat
-
-  Halaman ini BERDIRI SENDIRI. Jangan menambahkan tautan apa pun ke
-  index.html: halaman ini justru tujuan pengalihan bagi pengunjung
-  tanpa kode undangan.
-
-  Foto diambil dari folder foto/ yang sama dengan undangan.
-  Tanpa pustaka eksternal. Animasi murni transform CSS.
-==================================================================
--->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=Italiana&family=Jost:wght@300;400&display=swap" rel="stylesheet">
@@ -415,9 +401,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(e.key === 'Escape' && lihat.classList.contains('is-open')) tutup();
   });
 
-  /* ---------- Latar video ----------
-     Baru diunduh setelah halaman selesai memuat, supaya foto yang dilihat
-     tamu lebih dulu tidak berebut jalur dengan berkas video. */
+
   var latarVid = $('#latarVid');
 
   function mainkanLatar(){

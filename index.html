@@ -7,26 +7,9 @@
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
 
-<!--
-==================================================================
-  UNDANGAN PERNIKAHAN LEO & LILY
-
-  BENTUK TAUTAN
-    ?k=a3f9c2b18e0d   kode pribadi tiap tamu, dibuat di spreadsheet
-    tanpa parameter   undangan gereja umum, tanpa nama
-
-  Berkas ini TIDAK memuat daftar tamu, kode, maupun detail resepsi.
-  Semuanya ditanyakan ke Apps Script saat halaman dibuka. Membuka
-  F12 di sini tidak memperlihatkan apa pun tentang venue.
-
-  YANG PERLU DIISI — semuanya di blok CONFIG dalam skrip di bawah.
-==================================================================
--->
 
 <script>
-/* Penjaga pintu. Tanpa kode undangan yang berbentuk sah, pengunjung
-   dialihkan ke galeri sebelum satu piksel pun undangan sempat tampil.
-   Sengaja diletakkan di <head> dan tanpa dependensi apa pun. */
+
 (function(){
   if(!/[?&]k=[A-Za-z0-9]{4,40}(?:&|$)/.test(location.search)){
     location.replace('gallery.html');
@@ -591,7 +574,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   <section class="sec sec--tint">
     <p class="eyebrow rv">RSVP</p>
     <h2 class="h-sec rv" style="margin-bottom:8px">Konfirmasi Kehadiran</h2>
-    <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerja sama Bapak/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
     <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 25 Oktober 2026</p>
 
     <div class="rv rv-2">
@@ -714,21 +696,10 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
-
-    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
-
-    /* Samakan PERSIS dengan TOKEN di Apps Script.
-       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
-
-    /* Berapa lama menunggu jawaban server sebelum menyerah (ms).
-       Kalau lewat, tamu tetap melihat undangan gereja. */
     batasTunggu: 5000,
-
-    /* Nomor WhatsApp untuk tamu yang perlu mengubah konfirmasi.
-       Format internasional tanpa tanda plus. Kosongkan bila tidak dipakai. */
-    kontakWA: '6281234567890'
+    kontakWA: ''
   };
   /* ============================================================ */
 
@@ -873,7 +844,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       ket.appendChild(document.createTextNode(' agar dapat kami sesuaikan.'));
     }else{
       ket.appendChild(document.createTextNode(
-        'Bila ada perubahan, mohon hubungi kami langsung agar dapat kami sesuaikan.'));
+        ''));
     }
 
     // Semua isian dimatikan, tombol kirim dilepas dari halaman
@@ -1099,9 +1070,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
 
-    /* Percobaan pertama membaca balasan server supaya pesannya spesifik.
-       Bila browser memblokir pembacaan lintas domain, kiriman diulang
-       dalam mode buta. Aman: Apps Script menimpa baris tamu yang sama. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
