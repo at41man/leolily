@@ -6,23 +6,6 @@
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
-
-<!--
-==================================================================
-  UNDANGAN PERNIKAHAN LEO & LILY
-
-  BENTUK TAUTAN
-    ?k=a3f9c2b18e0d   kode pribadi tiap tamu, dibuat di spreadsheet
-    tanpa parameter   undangan gereja umum, tanpa nama
-
-  Berkas ini TIDAK memuat daftar tamu, kode, maupun detail resepsi.
-  Semuanya ditanyakan ke Apps Script saat halaman dibuka. Membuka
-  F12 di sini tidak memperlihatkan apa pun tentang venue.
-
-  YANG PERLU DIISI — semuanya di blok CONFIG dalam skrip di bawah.
-==================================================================
--->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -538,7 +521,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </div>
 
-    <!-- Kartu resepsi disisipkan oleh skrip, hanya untuk kode ber-Jenis venue -->
+
   </section>
 
   <!-- GALERI -->
@@ -570,7 +553,6 @@ button{font:inherit;color:inherit;cursor:pointer}
         <img src="foto/8.jpg" alt="Prewedding 5" loading="lazy">
       </figure>
 
-      <!-- Video: berkas di folder video/, poster di folder foto/ -->
       <figure class="ph gal__wide rv" style="--ar:16/9">
         <video id="galeriVideo" class="vid" autoplay muted loop playsinline
                preload="none" poster="foto/video-poster.jpg"
@@ -616,7 +598,6 @@ button{font:inherit;color:inherit;cursor:pointer}
         <textarea id="gMsg" placeholder="Tulis ucapan dan doa Anda…"></textarea>
       </div>
 
-      <!-- Honeypot: tak terlihat manusia, tapi bot cenderung mengisinya. Jangan dihapus. -->
       <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
         <label for="gSite">Website</label>
         <input id="gSite" type="text" tabindex="-1" autocomplete="off">
@@ -737,16 +718,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
-
-    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
-
-    /* Samakan PERSIS dengan TOKEN di Apps Script.
-       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
-
-    /* Berapa lama menunggu jawaban server sebelum menyerah (ms).
-       Kalau lewat, tamu tetap melihat undangan gereja. */
     batasTunggu: 5000
   };
   /* ============================================================ */
@@ -755,23 +728,18 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-  /* ---------- Kode tamu dari URL ----------
-     Yang dibaca hanya ?k=KODE. Nama, jenis undangan, dan detail resepsi
-     semuanya datang dari Apps Script, bukan dari tautan. */
   var KODE = (function(){
     var m = location.search.match(/[?&]k=([A-Za-z0-9]{4,40})(?:&|$)/);
     return m ? m[1].toLowerCase() : '';
   })();
 
   var TAMU     = '';
-  var SUDAH    = null;        // jawaban RSVP yang sudah tersimpan, bila ada
-  var UNDANGAN = 'gereja';   // bawaan paling aman; dinaikkan hanya oleh server
+  var SUDAH    = null;        
+  var UNDANGAN = 'gereja';   
   var siapPakai = false;
 
-  /* Tombol Buka Undangan dikunci sampai server menjawab, supaya tamu tidak
-     pernah melihat nama atau isi undangan berubah di depan matanya. */
   var btnBuka  = $('#openBtn');
-  var lblBuka  = btnBuka.lastChild;          // simpul teks di dalam tombol
+  var lblBuka  = btnBuka.lastChild;          
   var teksBuka = lblBuka.nodeValue;
 
   function bukaKunci(){
@@ -788,7 +756,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     var isiNama = $('#gName');
     if(isiNama){
       isiNama.value = n;
-      isiNama.readOnly = true;        // nama datang dari daftar tamu, bukan ketikan
+      isiNama.readOnly = true;        
       isiNama.classList.add('is-locked');
       isiNama.removeAttribute('placeholder');
       isiNama.setAttribute('aria-readonly', 'true');
@@ -797,8 +765,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
   }
 
-  /* Bangun kartu resepsi dari data server. Tidak ada satu pun detailnya
-     yang tertulis di berkas ini. */
+
   function pasangResepsi(r){
     if(!r || $('#kartuResepsi')) return;
     var d = document.createElement('div');
@@ -829,7 +796,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     $('#acara').appendChild(d);
 
-    // Pulihkan opsi venue di RSVP
     var sel = $('#gAttend');
     ['Venue','Keduanya'].forEach(function(v, i){
       if(sel.querySelector('option[value="'+v+'"]')) return;
@@ -838,7 +804,6 @@ button{font:inherit;color:inherit;cursor:pointer}
       sel.insertBefore(o, sel.children[1 + i]);
     });
 
-    // Animasi muncul mengikuti pola yang sama dengan elemen lain
     if(typeof io !== 'undefined' && io && io.observe){ io.observe(d); }
     else { d.classList.add('is-in'); }
   }
@@ -851,8 +816,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   terapkanGereja();
 
-  /* Isi formulir dengan jawaban yang sudah tersimpan, dan tegaskan bahwa
-     kiriman berikutnya MENGGANTI jawaban itu — bukan menambahkannya. */
   function pasangJawabanLama(r){
     SUDAH = r;
 
@@ -879,8 +842,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     TEKS_KIRIM = 'Perbarui Konfirmasi';
   }
 
-  /* Tanya server. JSONP dipakai supaya lolos pembatasan lintas domain
-     tanpa bergantung pada perilaku CORS Apps Script yang tidak dijamin. */
   (function cariTamu(){
     if(!KODE || !CONFIG.rsvpEndpoint){ siapPakai = true; return; }
 
@@ -894,7 +855,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     function selesai(){
       if(beres) return;
       beres = true;
-      bukaKunci();                  // apa pun hasilnya, tamu tidak dibiarkan terkunci
+      bukaKunci();                 
       try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
       if(sc.parentNode) sc.parentNode.removeChild(sc);
     }
@@ -924,17 +885,16 @@ button{font:inherit;color:inherit;cursor:pointer}
   var cover    = $('#cover');
   var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
-    if(!siapPakai) return;             // tombol memang terkunci; jaga-jaga saja
-    playMusic();                       // dipanggil di dalam gestur tamu
+    if(!siapPakai) return;             
+    playMusic();                       
     cover.classList.add('is-open');
-    blackout.classList.add('is-on');   // 700ms menuju gelap total
+    blackout.classList.add('is-on');   
 
     setTimeout(function(){
       cover.classList.add('is-gone');
       document.body.classList.remove('is-locked');
       window.scrollTo(0,0);
       $('#fab').hidden = false;
-      // satu frame jeda supaya layout undangan mapan sebelum disingkap
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){ blackout.classList.remove('is-on'); });
       });
@@ -1039,16 +999,14 @@ button{font:inherit;color:inherit;cursor:pointer}
       kode: KODE,
       sumber: UNDANGAN,
       token: CONFIG.rsvpToken,
-      hp: $('#gSite').value,                        // honeypot, harus kosong
-      dwell: Math.round((Date.now() - MULAI)/1000)  // detik sejak halaman dibuka
+      hp: $('#gSite').value,                        
+      dwell: Math.round((Date.now() - MULAI)/1000)  
     };
 
     function kalimat(res){
       var kini  = (res && res.tercatat) ? res.tercatat : status;
       var orang = (res && typeof res.dicatat === 'number') ? res.dicatat : jumlah;
 
-      /* Untuk revisi, tampilkan dulu konfirmasi sebelumnya supaya tamu
-         yakin perubahannya benar-benar tercatat. */
       var awal = '';
       if(res && res.diperbarui && res.sebelumnya && res.sebelumnya.kehadiran){
         var sb = res.sebelumnya;
@@ -1084,8 +1042,6 @@ button{font:inherit;color:inherit;cursor:pointer}
       if(pesan){ wishes.unshift({ n:nama, s:status, m:pesan }); renderWishes(); }
       $('#gMsg').value = '';
 
-      // Jawaban tersimpan yang terbaru, supaya revisi berikutnya
-      // membandingkan terhadap data yang benar.
       SUDAH = {
         kehadiran: (res && res.tercatat) ? res.tercatat : status,
         jumlah   : (res && typeof res.dicatat === 'number') ? res.dicatat : jumlah
@@ -1097,9 +1053,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
 
-    /* Percobaan pertama membaca balasan server supaya pesannya spesifik.
-       Bila browser memblokir pembacaan lintas domain, kiriman diulang
-       dalam mode buta. Aman: Apps Script menimpa baris tamu yang sama. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1116,10 +1069,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     });
   }
 
-  /* ---------- Gerbang konfirmasi untuk revisi ----------
-     Tamu yang sudah pernah menjawab harus melihat perbandingan lama vs baru
-     sebelum kiriman diproses. Ini mencegah anggapan bahwa mengirim berulang
-     berarti menambah jumlah kursi. */
+
   var konfirm = $('#konfirm');
 
   function tutupKonfirm(){
@@ -1143,7 +1093,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     var nama = $('#gName').value.trim();
     if(!nama){ tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return; }
 
-    // Belum pernah menjawab -> langsung kirim
     if(!SUDAH || !SUDAH.kehadiran){ kirimRsvp(); return; }
 
     var st  = $('#gAttend').value;
@@ -1250,8 +1199,6 @@ button{font:inherit;color:inherit;cursor:pointer}
       mainkanVideo();
     }
 
-    /* Tombol suara. Video bersuara -> musik latar berhenti,
-       lalu lanjut lagi begitu video dibisukan kembali. */
     if(vidSound){
       vidSound.addEventListener('click', function(){
         video.muted = !video.muted;
