@@ -4,16 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
-<meta name="description" content="Wedding Invitation Leo & Lily — Sabtu, 7 November 2026.">
+<meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
 
 <!--
 ==================================================================
-  YANG PERLU DIISI — semuanya ada di blok CONFIG dalam <script>
-  1. rsvpEndpoint : URL Web App dari Google Apps Script
-  2. rsvpToken    : samakan persis dengan TOKEN di Apps Script
-  3. musik        : letakkan berkasnya di folder musik/
-  4. video        : letakkan berkasnya di folder video/ + poster
+  UNDANGAN PERNIKAHAN LEO & LILY  —  satu berkas untuk dua daftar tamu
+
+  BENTUK TAUTAN
+    ?to=budi-santoso     undangan lengkap (pemberkatan + resepsi)
+    ?g=budi-santoso      undangan gereja saja, tetap personal
+    tanpa parameter      undangan gereja saja, tanpa nama
+
+  Bila CONFIG.kodeVenue diisi, tautan resepsi menjadi:
+    ?k=KODE&to=budi-santoso
+  dan ?to= tanpa kode yang cocok otomatis jatuh ke versi gereja.
+
+  YANG PERLU DIISI — semuanya di blok CONFIG dalam skrip di bawah.
 ==================================================================
 -->
 
@@ -126,7 +133,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sec--flush{padding-left:0;padding-right:0}
 .inner{padding-inline:var(--edge)}
 
-/* ---------- PLACEHOLDER FOTO ---------- */
+/* ---------- FOTO & VIDEO ---------- */
 .ph{
   position:relative;
   margin:0;
@@ -139,7 +146,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   display:grid;
   place-items:center;
 }
-.sec--dark .ph{background:rgba(255,255,255,.04);border-color:rgba(198,219,195,.4)}
 .ph img,.ph .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
 .ph .vid{background:#0C1712}
 .vid__snd{
@@ -152,18 +158,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 .vid__snd .on{display:none}
 .vid__snd.is-on .on{display:block}
 .vid__snd.is-on .off{display:none}
-.ph__tag{
-  font-family:var(--f-util);
-  font-size:12px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:var(--gold);
-  text-align:center;
-  padding:10px;
-}
-.ph__tag b{display:block;font-weight:500;font-size:13px;letter-spacing:.2em}
-.ph__tag small{display:block;font-size:10px;letter-spacing:.18em;opacity:.72;margin-top:5px}
-.ph__tag svg{width:22px;height:22px;margin:0 auto 9px;display:block;opacity:.75}
 
 /* ---------- COVER ---------- */
 .cover{position:fixed;inset:0;z-index:90}
@@ -241,28 +235,45 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ---------- ACARA ---------- */
 .event{
-  border:1px solid rgba(85,120,91,.3);
-  padding:clamp(30px,8vw,40px) 20px clamp(28px,7vw,34px);
-  background:var(--paper);
+  text-align:center;
   position:relative;
+  padding:clamp(30px,8vw,40px) 20px clamp(28px,7vw,34px);
+  border:1px solid rgba(198,219,195,.22);
+  background-color:var(--claret-deep);
+  background-image:radial-gradient(110% 80% at 50% 0%,rgba(126,168,131,.22),transparent 72%);
+  color:#E8F0E6;
 }
 .event + .event{margin-top:22px}
+.event .orn{color:var(--gold-2);opacity:.75}
 
 .event__t{
   font-family:var(--f-display);
   font-size:clamp(23px,6vw,27px);
   line-height:1.25;
-  color:var(--claret);
-  margin:14px 0 20px;
+  color:var(--gold-2);
+  margin:14px auto 22px;
 }
-
-/* Jam — elemen paling menonjol di kartu */
+.event__venue{
+  font-family:var(--f-display);
+  font-size:clamp(19px,5vw,22px);
+  line-height:1.35;
+  color:#EAF2E7;
+  margin:0 auto 8px;
+}
+.event__addr{
+  font-size:16px;
+  line-height:1.6;
+  color:rgba(232,240,230,.68);
+  max-width:30ch;
+  margin:0 auto;
+}
+.event__hr{width:44px;height:1px;background:rgba(198,219,195,.35);margin:22px auto 20px}
 .event__time{
   font-family:var(--f-display);
   font-size:clamp(46px,13vw,58px);
   line-height:1;
-  color:var(--claret);
-  margin:0;
+  color:#FBFDF9;
+  margin:0 auto;
   letter-spacing:.01em;
 }
 .event__time span{
@@ -272,58 +283,11 @@ button{font:inherit;color:inherit;cursor:pointer}
   letter-spacing:.22em;
   vertical-align:middle;
   margin-left:8px;
-  color:var(--gold);
+  color:var(--gold-2);
 }
-.event__day{
-  font-family:var(--f-util);
-  font-size:11px;
-  letter-spacing:.26em;
-  text-transform:uppercase;
-  color:var(--gold);
-  margin:0 0 12px;
-}
-
-.event__hr{width:44px;height:1px;background:rgba(85,120,91,.45);margin:24px auto}
-
-.event__venue{
-  font-family:var(--f-display);
-  font-size:clamp(19px,5vw,22px);
-  line-height:1.35;
-  color:var(--ink);
-  margin:0 0 8px;
-}
-.event__addr{
-  font-size:16px;
-  line-height:1.6;
-  color:var(--ink-soft);
-  max-width:30ch;
-  margin:0 auto;
-}
-
-.event{text-align:center}
-.event__t,.event__day,.event__time,.event__venue{margin-inline:auto}
-
-/* Kartu acara bernuansa hijau */
-.event{
-  background-color:var(--claret-deep);
-  background-image:radial-gradient(110% 80% at 50% 0%,rgba(126,168,131,.22),transparent 72%);
-  border-color:rgba(198,219,195,.22);
-  color:#E8F0E6;
-}
-.event .orn{color:var(--gold-2);opacity:.75}
-.event__t{color:var(--gold-2)}
-.event__time{color:#FBFDF9}
-.event__time span{color:var(--gold-2)}
-.event__venue{color:#EAF2E7}
-.event__addr{color:rgba(232,240,230,.68)}
-.event__hr{background:rgba(198,219,195,.35)}
 .event .btn--ghost{border-color:rgba(198,219,195,.45);color:var(--gold-2)}
 .event .btn--ghost:hover,.event .btn--ghost:focus-visible{
   background:var(--gold-2);border-color:var(--gold-2);color:#12211A;
-  
-  .event__t{margin:14px 0 22px}
-.event__hr{margin:22px auto 20px}
-.event__time{margin:0}
 }
 
 /* ---------- GALERI ---------- */
@@ -363,29 +327,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fab__btn--play.is-playing svg{animation:spin 5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---------- REVEAL (ringan: opacity + transform saja) ---------- */
-.rv{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.6,.2,1)}
-.rv.is-in{opacity:1;transform:none}
-.rv-2{transition-delay:.12s}
-.rv-3{transition-delay:.24s}
-
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-
-@media (min-width:560px){
-  .hero__names{font-size:60px}
-}
-@media (prefers-reduced-motion:reduce){
-  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
-  .rv{opacity:1;transform:none}
-}
 /* ---------- WEDDING GIFT ---------- */
 .gift__ico{width:52px;height:52px;margin:0 auto 18px;display:block;color:var(--gold-2);opacity:.9}
-
 .gift{position:fixed;inset:0;z-index:96;display:none}
 .gift.is-open{display:block}
 .gift__bg{
   position:absolute;inset:0;background:rgba(8,16,12,.55);
-  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
   opacity:0;transition:opacity .3s ease;
 }
 .gift.is-in .gift__bg{opacity:1}
@@ -401,7 +349,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   position:absolute;top:8px;right:10px;width:34px;height:34px;
   background:none;border:0;color:rgba(232,240,230,.6);font-size:24px;line-height:1;
 }
-
 .bank{border:1px solid rgba(198,219,195,.28);padding:20px 16px;margin-top:16px}
 .bank__no{font-family:var(--f-util);font-size:19px;letter-spacing:.1em;color:var(--gold-2);margin:8px 0 4px}
 .bank__nm{font-family:var(--f-util);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,240,230,.65);margin:0 0 16px}
@@ -411,6 +358,22 @@ button{font:inherit;color:inherit;cursor:pointer}
   padding:9px 18px;border-radius:2px;transition:background .3s ease,color .3s ease;
 }
 .copy:hover,.copy:focus-visible{background:var(--gold);color:#12211A}
+
+/* ---------- REVEAL (ringan: opacity + transform saja) ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.6,.2,1)}
+.rv.is-in{opacity:1;transform:none}
+.rv-2{transition-delay:.12s}
+.rv-3{transition-delay:.24s}
+
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+@media (min-width:560px){
+  .hero__names{font-size:60px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .rv{opacity:1;transform:none}
+}
 </style>
 </head>
 
@@ -443,7 +406,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <!-- HERO -->
   <section class="hero">
     <div class="hero__frame rv">
-      <p class="eyebrow">Undangan Pernikahan</p>
+      <p class="eyebrow" id="heroLabel">Undangan Pernikahan</p>
       <h1 class="h-display hero__names">Leo<span class="hero__amp">and</span>Lily</h1>
       <div class="rule" style="height:34px"></div>
       <p class="cover__date" style="color:var(--ink-soft)">07 · 11 · 2026</p>
@@ -519,6 +482,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </section>
 
   <!-- ACARA -->
+  <section class="sec">
     <div class="event rv">
       <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
       <h3 class="event__t">Pemberkatan Pernikahan</h3>
@@ -535,7 +499,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </div>
 
-    <div class="event rv rv-2">
+    <!-- Kartu ini DIHAPUS otomatis bila halaman dibuka tanpa ?to=Nama -->
+    <div class="event rv rv-2" id="kartuResepsi">
       <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
       <h3 class="event__t">Resepsi Pernikahan</h3>
 
@@ -550,6 +515,7 @@ button{font:inherit;color:inherit;cursor:pointer}
         <a class="btn btn--ghost" href="https://maps.app.goo.gl/YPZWsgvHtVnJNmGaA" target="_blank" rel="noopener">Lihat Lokasi</a>
       </div>
     </div>
+  </section>
 
   <!-- GALERI -->
   <section class="sec sec--flush">
@@ -580,8 +546,8 @@ button{font:inherit;color:inherit;cursor:pointer}
         <img src="foto/8.jpg" alt="Prewedding 5" loading="lazy">
       </figure>
 
-      <!-- Video: taruh berkasnya di folder video/, poster di folder foto/ -->
-		<figure class="ph gal__wide rv" style="--ar:16/9">
+      <!-- Video: berkas di folder video/, poster di folder foto/ -->
+      <figure class="ph gal__wide rv" style="--ar:16/9">
         <video id="galeriVideo" class="vid" autoplay muted loop playsinline
                preload="none" poster="foto/video-poster.jpg"
                data-src="video/teaser.mp4"></video>
@@ -606,8 +572,8 @@ button{font:inherit;color:inherit;cursor:pointer}
         <input id="gName" type="text" placeholder="Nama Anda" autocomplete="name">
       </div>
       <div class="field">
-       <label for="gAttend">Konfirmasi kehadiran</label>
-       <select id="gAttend">
+        <label for="gAttend">Konfirmasi kehadiran</label>
+        <select id="gAttend">
           <option value="Gereja">Gereja</option>
           <option value="Venue">Venue</option>
           <option value="Keduanya">Keduanya</option>
@@ -638,7 +604,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     <div class="wishes" id="wishes"></div>
   </section>
-  
+
   <!-- WEDDING GIFT -->
   <section class="sec sec--dark">
     <svg class="gift__ico rv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1">
@@ -647,7 +613,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <path d="M12 9.5S9.6 3.6 7.2 5s2 4.5 4.8 4.5zM12 9.5s2.4-5.9 4.8-4.5-2 4.5-4.8 4.5z"/>
     </svg>
     <h2 class="h-sec rv" style="margin-bottom:8px">Wedding Gift</h2>
-    <p class="lead rv rv-2">Tanpa mengurangi rasa hormat, bagi yang berkenan memberikan tanda kasih dapat melalui rekening....</p>
+    <p class="lead rv rv-2">Tanpa mengurangi rasa hormat, bagi yang berkenan memberikan tanda kasih dapat melalui rekening berikut.</p>
     <div style="margin-top:28px" class="rv rv-2">
       <button class="btn" type="button" id="giftBtn">Kirim Hadiah ♡</button>
     </div>
@@ -717,6 +683,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     tanggal: '2026-11-07T10:30:00+07:00',   // pemberkatan, untuk hitung mundur & .ics
     acara:   'Pemberkatan & Resepsi Pernikahan Leo & Lily',
     lokasi:  'GKMI Pemuda, Jl. Pemuda No. 75, Semarang',
+    durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
 
@@ -725,7 +692,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     /* Samakan PERSIS dengan TOKEN di Apps Script.
        Tidak rahasia (terbaca di source) — hanya menyaring bot. */
-    rsvpToken: 'at41man-leolily-2026'
+    rsvpToken: 'at41man-leolily-2026',
+
+    /* Kode rahasia untuk tautan resepsi. Kosongkan bila tidak dipakai.
+       Bila diisi, tautan resepsi harus berbentuk:
+         https://leolily.my.id/?k=KODE&to=budi-santoso
+       dan ?to= tanpa kode yang cocok hanya melihat versi gereja. */
+    kodeVenue: ''
   };
   /* ============================================================ */
 
@@ -733,33 +706,60 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-  /* ---------- Nama tamu dari URL ----------
-     Semua bentuk ini menghasilkan "Budi Santoso & Family":
-       ?to=budi-santoso-&-family
-       ?to=Budi%20Santoso%20%26%20Family
-       ?to=Budi+Santoso+%26+Family
-     Nama dipasang lewat textContent, jadi tag HTML dalam URL tidak dieksekusi. */
+  /* ---------- Baca tautan ----------
+     ?to= / ?u=  -> undangan lengkap      ?g= -> undangan gereja
+     ?k=KODE&to= -> undangan lengkap bila KODE cocok
+     Seluruh sisa string sesudah tanda sama dengan diambil apa adanya,
+     supaya karakter & di dalam nama tidak dianggap pemisah parameter. */
+  var LINK = (function(){
+    try{
+      var q = location.search.replace(/^\?/, '');
+      var m = q.match(/^k=([^&]*)&(to|u)=([\s\S]*)$/i);
+      if(m){ return { kode:m[1], jenis:'to', nilai:m[3] }; }
+      m = q.match(/^(to|u|g)=([\s\S]*)$/i);
+      if(m){ return { kode:'', jenis:m[1].toLowerCase()==='g' ? 'g' : 'to', nilai:m[2] }; }
+      return { kode:'', jenis:'', nilai: location.hash.replace(/^#/, '') };
+    }catch(e){ return { kode:'', jenis:'', nilai:'' }; }
+  })();
+
+  /* Jenis undangan. Tanpa parameter -> gereja. */
+  var UNDANGAN = 'gereja';
+  if(LINK.jenis === 'to' && (!CONFIG.kodeVenue || LINK.kode === CONFIG.kodeVenue)){
+    UNDANGAN = 'utama';
+  }
+
   var TAMU = (function(){
     try{
-      var s = location.search.replace(/^\?/, '');
-      // Ambil SELURUH sisa string setelah to= / u= supaya karakter &
-      // di dalam nama tidak dianggap pemisah parameter.
-      var m = s.match(/^(?:to|u)=([\s\S]*)$/i);
-      var v = m ? m[1] : (new URLSearchParams(s).get('to') || location.hash.replace(/^#/, ''));
-      v = v.replace(/\+/g, ' ');
+      var v = String(LINK.nilai || '').replace(/\+/g, ' ');
       try{ v = decodeURIComponent(v); }catch(e){}
       v = v.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+      // Kapitalkan awal kata, biarkan yang sudah ditulis rapi apa adanya
       return v.replace(/\S+/g, function(w){
         return w === w.toLowerCase() ? w.charAt(0).toUpperCase() + w.slice(1) : w;
       });
     }catch(e){ return ''; }
   })();
 
+  var LABEL = (UNDANGAN === 'utama') ? 'Undangan Pernikahan' : 'Undangan Pemberkatan';
+
   if(TAMU){
     $('#guestName').textContent = TAMU;
-    document.title = TAMU + ' — Undangan Pernikahan Leo & Lily';
+    document.title = TAMU + ' — ' + LABEL + ' Leo & Lily';
     var isiNama = $('#gName');
     if(isiNama && !isiNama.value){ isiNama.value = TAMU; }
+  }
+
+  /* Undangan gereja: kartu resepsi dan pilihan venue dihapus dari halaman,
+     bukan sekadar disembunyikan lewat CSS. */
+  if(UNDANGAN === 'gereja'){
+    $('#heroLabel').textContent = LABEL;
+    var kr = $('#kartuResepsi');
+    if(kr){ kr.parentNode.removeChild(kr); }
+    $$('#gAttend option').forEach(function(o){
+      if(o.value === 'Venue' || o.value === 'Keduanya'){ o.parentNode.removeChild(o); }
+    });
+    CONFIG.acara     = 'Pemberkatan Pernikahan Leo & Lily';
+    CONFIG.durasiJam = 2.5;
   }
 
   /* ---------- Buka sampul: crossfade ke hitam, lalu ke dalam undangan ---------- */
@@ -819,18 +819,19 @@ button{font:inherit;color:inherit;cursor:pointer}
   $('#calBtn').addEventListener('click', function(){
     function fmt(d){ return d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z'; }
     var start = new Date(CONFIG.tanggal);
-    var end   = new Date(start.getTime() + 10*3600*1000);   // sampai selesai resepsi
+    var end   = new Date(start.getTime() + CONFIG.durasiJam*3600*1000);
     var ics = ['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
       'DTSTART:'+fmt(start),'DTEND:'+fmt(end),
       'SUMMARY:'+CONFIG.acara,'LOCATION:'+CONFIG.lokasi,
       'END:VEVENT','END:VCALENDAR'].join('\r\n');
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
-    a.download = 'pernikahan-leo-lily.ics';
+    a.download = (UNDANGAN === 'utama' ? 'pernikahan' : 'pemberkatan') + '-leo-lily.ics';
     a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   });
 
+  /* ---------- Ucapan yang tampil di halaman (hanya sesi ini) ---------- */
   var wishes = [];
   function renderWishes(){
     var box = $('#wishes');
@@ -848,7 +849,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- RSVP ---------- */
   $('#gAttend').addEventListener('change', function(e){
-     $('#fieldJumlah').style.display = (e.target.value === 'Tidak Hadir') ? 'none' : 'block';
+    $('#fieldJumlah').style.display = (e.target.value === 'Tidak Hadir') ? 'none' : 'block';
   });
 
   var btnSend = $('#sendWish');
@@ -875,6 +876,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       nama: nama, kehadiran: status, jumlah: jumlah, ucapan: pesan,
       waktu: new Date().toISOString(),
       undangan: TAMU,
+      sumber: UNDANGAN,
       token: CONFIG.rsvpToken,
       hp: $('#gSite').value,                        // honeypot, harus kosong
       dwell: Math.round((Date.now() - MULAI)/1000)  // detik sejak halaman dibuka
@@ -911,6 +913,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
 
+    /* Percobaan pertama membaca balasan server supaya pesannya spesifik.
+       Bila browser memblokir pembacaan lintas domain, kiriman diulang
+       dalam mode buta. Aman: Apps Script menimpa baris tamu yang sama. */
     fetch(CONFIG.rsvpEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
