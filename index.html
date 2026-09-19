@@ -407,6 +407,45 @@ button{font:inherit;color:inherit;cursor:pointer}
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
   .rv{opacity:1;transform:none}
 }
+/* ---------- PENUTUP ---------- */
+.keluarga{
+  font-family:var(--f-body);
+  font-size:17px;
+  line-height:1.4;
+  color:var(--ink-soft);
+  max-width:30ch;
+  margin:0 auto;
+}
+.keluarga__nama{display:block;color:var(--ink)}
+.keluarga__cn{
+  display:block;
+  font-style:italic;
+  font-size:.88em;
+  color:var(--gold);
+  margin-top:1px;
+}
+/* Penghubung suami-istri: kecil, tidak mencuri perhatian */
+.keluarga__amp{
+  display:block;
+  font-family:var(--f-body);
+  font-style:italic;
+  font-size:15px;
+  line-height:1;
+  color:var(--gold);
+  margin:9px 0;
+}
+/* Pemisah antar-keluarga: ornamen, bukan tanda & lagi */
+.keluarga__pisah{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:26px auto;max-width:190px;
+}
+.keluarga__pisah::before,.keluarga__pisah::after{
+  content:'';flex:1;height:1px;background:rgba(85,120,91,.3);
+}
+.keluarga__pisah i{
+  width:6px;height:6px;flex:none;
+  border:1px solid var(--gold);transform:rotate(45deg);
+}
 </style>
 </head>
 
@@ -481,7 +520,7 @@ button{font:inherit;color:inherit;cursor:pointer}
           <img src="foto/leo.jpg" alt="Leonard Haryanto">
         </figure>
         <h3 class="person__name">Leonard Haryanto<br><span class="person__nick">Leo</span></h3>
-        <p class="person__meta">Putra Kedua Anak Kedua dari<br>Alm. Tn. Barkah Harjanto ( Lie Hok Swie ) &amp;<br>Ny. Lindia Puspasari ( Go Lien Nio )</p>
+        <p class="person__meta">Putra Kedua Anak Kedua dari<br>(&dagger;) Alm. Tn. Barkah Harjanto ( Lie Hok Swie ) &amp;<br>Ny. Lindia Puspasari ( Go Lien Nio )</p>
         <a class="person__ig" href="https://www.instagram.com/leonardharyanto_" target="_blank" rel="noopener">@leonardharyanto_</a>
       </div>
 
@@ -492,7 +531,7 @@ button{font:inherit;color:inherit;cursor:pointer}
           <img src="foto/lily.jpg" alt="Louisa Lily Meliani Wijoyo">
         </figure>
         <h3 class="person__name">Louisa Lily Meliani Wijoyo<br><span class="person__nick">Lily</span></h3>
-        <p class="person__meta">Putri Kedua Anak Kedua dari<br>Alm. Tn. Untung Wijoyo ( Oei Hoen Tjwan ) &amp;<br>Ny. Lindayati ( Soen Siu Lien )</p>
+        <p class="person__meta">Putri Kedua Anak Kedua dari<br>(&dagger;) Alm. Tn. Untung Wijoyo ( Oei Hoen Tjwan ) &amp;<br>Ny. Lindayati ( Soen Siu Lien )</p>
         <a class="person__ig" href="https://www.instagram.com/lilymeliani" target="_blank" rel="noopener">@lilymeliani</a>
       </div>
     </div>
@@ -653,7 +692,21 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="lead rv" style="max-width:32ch">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
     <div class="rule rv rv-2" style="margin-top:28px"></div>
     <p class="eyebrow rv rv-2" style="margin-top:22px">Kami yang berbahagia</p>
-    <h2 class="h-display rv rv-3" style="font-size:clamp(38px,11vw,52px)">Leo<span class="hero__amp">&amp;</span>Lily</h2>
+    <h2 class="h-display rv rv-2" style="font-size:clamp(38px,11vw,52px)">Leo<span class="hero__amp">&amp;</span>Lily</h2>
+    <p class="eyebrow rv rv-3" style="margin:38px 0 18px">Beserta Keluarga Besar</p>
+    <div class="keluarga rv rv-3">
+      <span class="keluarga__nama">(&dagger;) Alm. Tn. Barkah Harjanto</span>
+      <span class="keluarga__cn">Lie Hok Swie</span>
+      <span class="keluarga__amp">&amp;</span>
+      <span class="keluarga__nama">Ny. Lindia Puspasari</span>
+      <span class="keluarga__cn">Go Lien Nio</span>
+      <div class="keluarga__pisah"><i></i></div>
+      <span class="keluarga__nama">(&dagger;) Alm. Tn. Untung Wijoyo</span>
+      <span class="keluarga__cn">Oei Hoen Tjwan</span>
+      <span class="keluarga__amp">&amp;</span>
+      <span class="keluarga__nama">Ny. Lindayati</span>
+      <span class="keluarga__cn">Soen Siu Lien</span>
+    </div>
   </section>
 
   <footer class="sec sec--dark" style="padding-top:34px;padding-bottom:34px">
