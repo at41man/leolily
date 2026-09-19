@@ -6,24 +6,6 @@
 <title>Leo &amp; Lily — Undangan Pernikahan</title>
 <meta name="description" content="Wedding Invitation Leo &amp; Lily — Sabtu, 7 November 2026.">
 <meta name="theme-color" content="#16261E">
-
-<!--
-==================================================================
-  UNDANGAN PERNIKAHAN LEO & LILY  —  satu berkas untuk dua daftar tamu
-
-  BENTUK TAUTAN
-    ?to=budi-santoso     undangan lengkap (pemberkatan + resepsi)
-    ?g=budi-santoso      undangan gereja saja, tetap personal
-    tanpa parameter      undangan gereja saja, tanpa nama
-
-  Bila CONFIG.kodeVenue diisi, tautan resepsi menjadi:
-    ?k=KODE&to=budi-santoso
-  dan ?to= tanpa kode yang cocok otomatis jatuh ke versi gereja.
-
-  YANG PERLU DIISI — semuanya di blok CONFIG dalam skrip di bawah.
-==================================================================
--->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -68,8 +50,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   background-color:var(--paper);
   overflow:hidden;
   box-shadow:0 0 80px rgba(0,0,0,.45);
-  /* Tekstur kertas: butiran halus + cahaya hijau di ujung atas & bawah.
-     SVG inline, tanpa berkas tambahan, hanya dilukis sekali. */
   background-image:
     radial-gradient(120% 50% at 50% 0%,rgba(85,120,91,.09),transparent 65%),
     radial-gradient(120% 40% at 50% 100%,rgba(85,120,91,.06),transparent 65%),
@@ -686,19 +666,9 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
-
-    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
-
-    /* Samakan PERSIS dengan TOKEN di Apps Script.
-       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
-
-    /* Kode rahasia untuk tautan resepsi. Kosongkan bila tidak dipakai.
-       Bila diisi, tautan resepsi harus berbentuk:
-         https://leolily.my.id/?k=KODE&to=budi-santoso
-       dan ?to= tanpa kode yang cocok hanya melihat versi gereja. */
-    kodeVenue: ''
+    kodeVenue: 'xWerat45'
   };
   /* ============================================================ */
 
@@ -706,11 +676,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-  /* ---------- Baca tautan ----------
-     ?to= / ?u=  -> undangan lengkap      ?g= -> undangan gereja
-     ?k=KODE&to= -> undangan lengkap bila KODE cocok
-     Seluruh sisa string sesudah tanda sama dengan diambil apa adanya,
-     supaya karakter & di dalam nama tidak dianggap pemisah parameter. */
   var LINK = (function(){
     try{
       var q = location.search.replace(/^\?/, '');
@@ -749,8 +714,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(isiNama && !isiNama.value){ isiNama.value = TAMU; }
   }
 
-  /* Undangan gereja: kartu resepsi dan pilihan venue dihapus dari halaman,
-     bukan sekadar disembunyikan lewat CSS. */
   if(UNDANGAN === 'gereja'){
     $('#heroLabel').textContent = LABEL;
     var kr = $('#kartuResepsi');
