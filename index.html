@@ -50,6 +50,8 @@ button{font:inherit;color:inherit;cursor:pointer}
   background-color:var(--paper);
   overflow:hidden;
   box-shadow:0 0 80px rgba(0,0,0,.45);
+  /* Tekstur kertas: butiran halus + cahaya hijau di ujung atas & bawah.
+     SVG inline, tanpa berkas tambahan, hanya dilukis sekali. */
   background-image:
     radial-gradient(120% 50% at 50% 0%,rgba(85,120,91,.09),transparent 65%),
     radial-gradient(120% 40% at 50% 100%,rgba(85,120,91,.06),transparent 65%),
@@ -462,7 +464,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </section>
 
   <!-- ACARA -->
-  <section class="sec">
+  <section class="sec" id="acara">
     <div class="event rv">
       <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
       <h3 class="event__t">Pemberkatan Pernikahan</h3>
@@ -479,22 +481,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </div>
 
-    <!-- Kartu ini DIHAPUS otomatis bila halaman dibuka tanpa ?to=Nama -->
-    <div class="event rv rv-2" id="kartuResepsi">
-      <svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>
-      <h3 class="event__t">Resepsi Pernikahan</h3>
-
-      <p class="event__venue">Palace Fine Cuisine Ballroom</p>
-      <p class="event__addr">Ruang Mahogany, Lantai 3<br>Jl. MH Thamrin No. 5, Semarang</p>
-
-      <div class="event__hr"></div>
-
-      <p class="event__time">18.00<span>WIB</span></p>
-
-      <div style="margin-top:26px">
-        <a class="btn btn--ghost" href="https://maps.app.goo.gl/YPZWsgvHtVnJNmGaA" target="_blank" rel="noopener">Lihat Lokasi</a>
-      </div>
-    </div>
+    <!-- Kartu resepsi disisipkan oleh skrip, hanya untuk kode ber-Jenis venue -->
   </section>
 
   <!-- GALERI -->
@@ -555,8 +542,6 @@ button{font:inherit;color:inherit;cursor:pointer}
         <label for="gAttend">Konfirmasi kehadiran</label>
         <select id="gAttend">
           <option value="Gereja">Gereja</option>
-          <option value="Venue">Venue</option>
-          <option value="Keduanya">Keduanya</option>
           <option value="Tidak Hadir">Tidak Hadir</option>
         </select>
       </div>
@@ -666,9 +651,17 @@ button{font:inherit;color:inherit;cursor:pointer}
     durasiJam: 10,
     volume:  0.55,
     musik:   'musik/lagu.mp3',
+
+    /* URL Web App dari Google Apps Script, diakhiri /exec */
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
+
+    /* Samakan PERSIS dengan TOKEN di Apps Script.
+       Tidak rahasia (terbaca di source) — hanya menyaring bot. */
     rsvpToken: 'at41man-leolily-2026',
-    kodeVenue: 'xWerat45'
+
+    /* Berapa lama menunggu jawaban server sebelum menyerah (ms).
+       Kalau lewat, tamu tetap melihat undangan gereja. */
+    batasTunggu: 8000
   };
   /* ============================================================ */
 
@@ -676,60 +669,142 @@ button{font:inherit;color:inherit;cursor:pointer}
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
 
-  var LINK = (function(){
-    try{
-      var q = location.search.replace(/^\?/, '');
-      var m = q.match(/^k=([^&]*)&(to|u)=([\s\S]*)$/i);
-      if(m){ return { kode:m[1], jenis:'to', nilai:m[3] }; }
-      m = q.match(/^(to|u|g)=([\s\S]*)$/i);
-      if(m){ return { kode:'', jenis:m[1].toLowerCase()==='g' ? 'g' : 'to', nilai:m[2] }; }
-      return { kode:'', jenis:'', nilai: location.hash.replace(/^#/, '') };
-    }catch(e){ return { kode:'', jenis:'', nilai:'' }; }
+  /* ---------- Kode tamu dari URL ----------
+     Yang dibaca hanya ?k=KODE. Nama, jenis undangan, dan detail resepsi
+     semuanya datang dari Apps Script, bukan dari tautan. */
+  var KODE = (function(){
+    var m = location.search.match(/[?&]k=([A-Za-z0-9]{4,40})(?:&|$)/);
+    return m ? m[1].toLowerCase() : '';
   })();
 
-  /* Jenis undangan. Tanpa parameter -> gereja. */
-  var UNDANGAN = 'gereja';
-  if(LINK.jenis === 'to' && (!CONFIG.kodeVenue || LINK.kode === CONFIG.kodeVenue)){
-    UNDANGAN = 'utama';
-  }
+  var TAMU     = '';
+  var UNDANGAN = 'gereja';   // bawaan paling aman; dinaikkan hanya oleh server
+  var siapPakai = false;
 
-  var TAMU = (function(){
-    try{
-      var v = String(LINK.nilai || '').replace(/\+/g, ' ');
-      try{ v = decodeURIComponent(v); }catch(e){}
-      v = v.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
-      // Kapitalkan awal kata, biarkan yang sudah ditulis rapi apa adanya
-      return v.replace(/\S+/g, function(w){
-        return w === w.toLowerCase() ? w.charAt(0).toUpperCase() + w.slice(1) : w;
-      });
-    }catch(e){ return ''; }
-  })();
-
-  var LABEL = (UNDANGAN === 'utama') ? 'Undangan Pernikahan' : 'Undangan Pemberkatan';
-
-  if(TAMU){
-    $('#guestName').textContent = TAMU;
-    document.title = TAMU + ' — ' + LABEL + ' Leo & Lily';
+  function pasangNama(n){
+    TAMU = n;
+    $('#guestName').textContent = n;
+    document.title = n + ' — Undangan Pernikahan Leo & Lily';
     var isiNama = $('#gName');
-    if(isiNama && !isiNama.value){ isiNama.value = TAMU; }
+    if(isiNama && !isiNama.value){ isiNama.value = n; }
   }
 
-  if(UNDANGAN === 'gereja'){
-    $('#heroLabel').textContent = LABEL;
-    var kr = $('#kartuResepsi');
-    if(kr){ kr.parentNode.removeChild(kr); }
-    $$('#gAttend option').forEach(function(o){
-      if(o.value === 'Venue' || o.value === 'Keduanya'){ o.parentNode.removeChild(o); }
+  /* Bangun kartu resepsi dari data server. Tidak ada satu pun detailnya
+     yang tertulis di berkas ini. */
+  function pasangResepsi(r){
+    if(!r || $('#kartuResepsi')) return;
+    var d = document.createElement('div');
+    d.className = 'event rv rv-2';
+    d.id = 'kartuResepsi';
+    d.innerHTML =
+      '<svg class="orn orn--sm" viewBox="0 0 78 12" fill="none" stroke="currentColor" stroke-width="1">' +
+        '<path d="M0 6h28M50 6h28"/><path d="M39 2l4 4-4 4-4-4z"/></svg>' +
+      '<h3 class="event__t"></h3>' +
+      '<p class="event__venue"></p>' +
+      '<p class="event__addr"></p>' +
+      '<div class="event__hr"></div>' +
+      '<p class="event__time"></p>' +
+      '<div style="margin-top:26px"><a class="btn btn--ghost" target="_blank" rel="noopener">Lihat Lokasi</a></div>';
+
+    d.querySelector('.event__t').textContent     = r.judul  || 'Resepsi Pernikahan';
+    d.querySelector('.event__venue').textContent = r.tempat || '';
+    var addr = d.querySelector('.event__addr');
+    String(r.alamat || '').split(/<br\s*\/?>/i).forEach(function(bar, i){
+      if(i) addr.appendChild(document.createElement('br'));
+      addr.appendChild(document.createTextNode(bar));   // teks murni, tag apa pun tidak dieksekusi
     });
+    d.querySelector('.event__time').textContent  = r.jam || '';
+    var sp = document.createElement('span'); sp.textContent = 'WIB';
+    d.querySelector('.event__time').appendChild(sp);
+    var a = d.querySelector('a.btn');
+    a.href = /^https:\/\/(maps\.app\.goo\.gl|www\.google\.com|goo\.gl)\//.test(r.maps || '') ? r.maps : '#';
+
+    $('#acara').appendChild(d);
+
+    // Pulihkan opsi venue di RSVP
+    var sel = $('#gAttend');
+    ['Venue','Keduanya'].forEach(function(v, i){
+      if(sel.querySelector('option[value="'+v+'"]')) return;
+      var o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.insertBefore(o, sel.children[1 + i]);
+    });
+
+    // Animasi muncul mengikuti pola yang sama dengan elemen lain
+    if(typeof io !== 'undefined' && io && io.observe){ io.observe(d); }
+    else { d.classList.add('is-in'); }
+  }
+
+  function terapkanGereja(){
+    $('#heroLabel').textContent = 'Undangan Pemberkatan';
     CONFIG.acara     = 'Pemberkatan Pernikahan Leo & Lily';
     CONFIG.durasiJam = 2.5;
   }
+
+  terapkanGereja();
+
+  /* Tanya server. JSONP dipakai supaya lolos pembatasan lintas domain
+     tanpa bergantung pada perilaku CORS Apps Script yang tidak dijamin. */
+  (function cariTamu(){
+    if(!KODE || !CONFIG.rsvpEndpoint){ siapPakai = true; return; }
+
+    var cb = 'cbTamu' + Math.floor(Math.random() * 1e9);
+    var sc = document.createElement('script');
+    var beres = false;
+
+    function selesai(){
+      if(beres) return;
+      beres = true; siapPakai = true;
+      try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
+      if(sc.parentNode) sc.parentNode.removeChild(sc);
+    }
+
+    window[cb] = function(res){
+      if(res && res.ok){
+        if(res.nama) pasangNama(res.nama);
+        if(res.jenis === 'venue' && res.resepsi){
+          UNDANGAN = 'utama';
+          $('#heroLabel').textContent = 'Undangan Pernikahan';
+          CONFIG.acara     = 'Pemberkatan & Resepsi Pernikahan Leo & Lily';
+          CONFIG.durasiJam = 10;
+          pasangResepsi(res.resepsi);
+        }
+      }
+      selesai();
+    };
+
+    sc.src = CONFIG.rsvpEndpoint + '?k=' + encodeURIComponent(KODE) + '&cb=' + cb;
+    sc.onerror = selesai;
+    document.head.appendChild(sc);
+    setTimeout(selesai, CONFIG.batasTunggu);
+  })();
 
   /* ---------- Buka sampul: crossfade ke hitam, lalu ke dalam undangan ---------- */
   var cover    = $('#cover');
   var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
     playMusic();                       // dipanggil di dalam gestur tamu
+
+    // Bila jawaban server belum tiba, tunggu sebentar supaya tamu tidak
+    // melihat undangan yang isinya berubah di depan matanya.
+    if(!siapPakai){
+      var btn = $('#openBtn');
+      btn.disabled = true;
+      var label = btn.lastChild;
+      var teksAsli = label.nodeValue;
+      label.nodeValue = ' Memuat…';
+      var mulai = Date.now();
+      var tunggu = setInterval(function(){
+        if(siapPakai || Date.now() - mulai > CONFIG.batasTunggu){
+          clearInterval(tunggu);
+          btn.disabled = false;
+          label.nodeValue = teksAsli;
+          btn.click();
+        }
+      }, 120);
+      return;
+    }
+
     cover.classList.add('is-open');
     blackout.classList.add('is-on');   // 700ms menuju gelap total
 
@@ -839,6 +914,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       nama: nama, kehadiran: status, jumlah: jumlah, ucapan: pesan,
       waktu: new Date().toISOString(),
       undangan: TAMU,
+      kode: KODE,
       sumber: UNDANGAN,
       token: CONFIG.rsvpToken,
       hp: $('#gSite').value,                        // honeypot, harus kosong
