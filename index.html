@@ -296,28 +296,16 @@ button{font:inherit;color:inherit;cursor:pointer}
   color:var(--ink-soft);
 }
 .notice b{color:var(--claret);font-weight:500}
+.notice--kunci{border-color:var(--claret);background:rgba(46,81,64,.08)}
+.notice__besar{
+  display:block;font-family:var(--f-display);font-size:26px;line-height:1.2;
+  color:var(--claret);margin:2px 0 10px;
+}
+.notice a{color:var(--claret)}
 .notice__t{
   display:block;font-family:var(--f-util);font-size:10.5px;letter-spacing:.2em;
   text-transform:uppercase;color:var(--gold);margin-bottom:8px;
 }
-.banding{margin:20px 0;text-align:left}
-.banding__row{
-  display:flex;justify-content:space-between;gap:14px;
-  padding:11px 0;border-top:1px solid rgba(198,219,195,.2);
-}
-.banding__k{
-  font-family:var(--f-util);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(232,240,230,.55);flex:none;padding-top:4px;
-}
-.banding__v{text-align:right;font-size:17px;color:#EAF2E7}
-.banding__v--baru{color:var(--gold-2)}
-.banding__n{
-  font-size:15px;line-height:1.6;color:rgba(232,240,230,.75);
-  margin:18px 0 0;text-align:left;
-}
-.aksi{display:flex;gap:10px;margin-top:24px}
-.aksi .btn{flex:1;justify-content:center;padding-inline:14px}
-
 .field input.is-locked{
   background:rgba(85,120,91,.07);
   border-style:dashed;
@@ -569,7 +557,6 @@ button{font:inherit;color:inherit;cursor:pointer}
   <section class="sec sec--tint">
     <p class="eyebrow rv">RSVP</p>
     <h2 class="h-sec rv" style="margin-bottom:8px">Konfirmasi Kehadiran</h2>
-    <p class="lead rv rv-2" style="margin-bottom:10px">Kami mohon kerja sama Bapak/Ibu untuk bersedia mengisi konfirmasi kehadiran demi tertibnya acara.</p>
     <p class="eyebrow rv rv-2" style="margin-bottom:30px">Batas konfirmasi · 25 Oktober 2026</p>
 
     <div class="rv rv-2">
@@ -598,11 +585,14 @@ button{font:inherit;color:inherit;cursor:pointer}
         <textarea id="gMsg" placeholder="Tulis ucapan dan doa Anda…"></textarea>
       </div>
 
+
       <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
         <label for="gSite">Website</label>
         <input id="gSite" type="text" tabindex="-1" autocomplete="off">
       </div>
-
+	
+		<p class="hint" style="margin:0 0 16px">Konfirmasi hanya dapat dikirim satu kali. Mohon diperiksa kembali sebelum mengirim.</p>
+		
       <button class="btn btn--solid" type="button" id="sendWish">Kirim Konfirmasi</button>
       <p class="hint" id="wishNote" role="status" aria-live="polite"></p>
     </div>
@@ -654,33 +644,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <div class="blackout" id="blackout"></div>
 
-<div class="gift" id="konfirm" role="dialog" aria-modal="true" aria-labelledby="konfirmTitle">
-  <div class="gift__bg" data-konfirm-batal></div>
-  <div class="gift__panel">
-    <button class="gift__close" type="button" data-konfirm-batal aria-label="Tutup">&times;</button>
-    <p class="eyebrow" style="color:var(--gold-2);margin-bottom:6px">Perubahan Konfirmasi</p>
-    <h3 class="h-display" id="konfirmTitle" style="font-size:26px;color:var(--gold-2)">Perbarui?</h3>
-
-    <div class="banding">
-      <div class="banding__row">
-        <span class="banding__k">Sebelumnya</span>
-        <span class="banding__v" id="kfLama"></span>
-      </div>
-      <div class="banding__row">
-        <span class="banding__k">Menjadi</span>
-        <span class="banding__v banding__v--baru" id="kfBaru"></span>
-      </div>
-    </div>
-
-    <p class="banding__n" id="kfCatatan"></p>
-
-    <div class="aksi">
-      <button class="btn" type="button" data-konfirm-batal>Batal</button>
-      <button class="btn btn--solid" type="button" id="kfLanjut">Ya, Perbarui</button>
-    </div>
-  </div>
-</div>
-
 <div class="gift" id="gift" role="dialog" aria-modal="true" aria-labelledby="giftTitle">
   <div class="gift__bg" data-gift-close></div>
   <div class="gift__panel">
@@ -720,13 +683,15 @@ button{font:inherit;color:inherit;cursor:pointer}
     musik:   'musik/lagu.mp3',
     rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbzDc50JvpD3SuE1SjhA-NlUFEn9HbxMkS8scdemTJJqjO-dEqVb9iqyp0xXWboMHj_Lkw/exec',
     rsvpToken: 'at41man-leolily-2026',
-    batasTunggu: 5000
+    batasTunggu: 5000,
+    kontakWA: ''
   };
   /* ============================================================ */
 
   var MULAI = Date.now();
   var $  = function(s,c){ return (c||document).querySelector(s); };
   var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+
 
   var KODE = (function(){
     var m = location.search.match(/[?&]k=([A-Za-z0-9]{4,40})(?:&|$)/);
@@ -765,7 +730,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
   }
 
-
   function pasangResepsi(r){
     if(!r || $('#kartuResepsi')) return;
     var d = document.createElement('div');
@@ -796,6 +760,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     $('#acara').appendChild(d);
 
+    // Pulihkan opsi venue di RSVP
     var sel = $('#gAttend');
     ['Venue','Keduanya'].forEach(function(v, i){
       if(sel.querySelector('option[value="'+v+'"]')) return;
@@ -804,6 +769,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       sel.insertBefore(o, sel.children[1 + i]);
     });
 
+    // Animasi muncul mengikuti pola yang sama dengan elemen lain
     if(typeof io !== 'undefined' && io && io.observe){ io.observe(d); }
     else { d.classList.add('is-in'); }
   }
@@ -816,31 +782,44 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   terapkanGereja();
 
-  function pasangJawabanLama(r){
+  function kunciFormulir(r){
     SUDAH = r;
-
-    var sel = $('#gAttend');
-    if(sel.querySelector('option[value="' + r.kehadiran + '"]')){ sel.value = r.kehadiran; }
-    if(r.jumlah >= 1){
-      var c = $('#gCount');
-      if(c.querySelector('option[value="' + r.jumlah + '"]')){ c.value = String(r.jumlah); }
-    }
-    sel.dispatchEvent(new Event('change'));
 
     var box = $('#rsvpSudah');
     box.hidden = false;
+    box.className = 'notice notice--kunci';
     box.innerHTML =
-      '<span class="notice__t">Anda sudah mengonfirmasi</span>' +
-      '<b></b><br><span></span>';
-    box.querySelector('b').textContent =
-      r.kehadiran + (r.jumlah ? ' · ' + r.jumlah + ' orang' : '');
-    box.querySelector('span:last-child').textContent =
-      'Bila ada perubahan, ubah pilihan di bawah lalu kirim ulang. ' +
-      'Jumlah ini menggantikan konfirmasi sebelumnya. ';
+      '<span class="notice__t">Konfirmasi Anda sudah kami terima</span>' +
+      '<span class="notice__besar"></span>' +
+      '<span class="notice__ket"></span>';
 
-    btnSend.textContent = 'Perbarui Konfirmasi';
-    TEKS_KIRIM = 'Perbarui Konfirmasi';
+    box.querySelector('.notice__besar').textContent =
+      r.kehadiran + (r.jumlah ? ' · ' + r.jumlah + ' orang' : '');
+
+    var ket = box.querySelector('.notice__ket');
+    ket.textContent = 'Terima kasih. Konfirmasi hanya dapat dikirim satu kali. ';
+    if(CONFIG.kontakWA){
+      var a = document.createElement('a');
+      a.href = 'https://wa.me/' + CONFIG.kontakWA;
+      a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'hubungi kami lewat WhatsApp';
+      ket.appendChild(document.createTextNode('Bila ada perubahan, mohon '));
+      ket.appendChild(a);
+      ket.appendChild(document.createTextNode(' agar dapat kami sesuaikan.'));
+    }else{
+      ket.appendChild(document.createTextNode(
+        'Bila ada perubahan, mohon hubungi kami langsung agar dapat kami sesuaikan.'));
+    }
+
+    // Semua isian dimatikan, tombol kirim dilepas dari halaman
+    ['#gName','#gAttend','#gCount','#gMsg'].forEach(function(sel){
+      var el = $(sel);
+      if(el){ el.disabled = true; el.classList.add('is-locked'); }
+    });
+    var fj = $('#fieldJumlah'); if(fj){ fj.style.display = 'none'; }
+    if(btnSend && btnSend.parentNode){ btnSend.parentNode.removeChild(btnSend); }
   }
+
 
   (function cariTamu(){
     if(!KODE || !CONFIG.rsvpEndpoint){ siapPakai = true; return; }
@@ -855,7 +834,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     function selesai(){
       if(beres) return;
       beres = true;
-      bukaKunci();                 
+      bukaKunci();                  // apa pun hasilnya, tamu tidak dibiarkan terkunci
       try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
       if(sc.parentNode) sc.parentNode.removeChild(sc);
     }
@@ -870,7 +849,7 @@ button{font:inherit;color:inherit;cursor:pointer}
           CONFIG.durasiJam = 10;
           pasangResepsi(res.resepsi);
         }
-        if(res.rsvp && res.rsvp.kehadiran){ pasangJawabanLama(res.rsvp); }
+        if(res.rsvp && res.rsvp.kehadiran){ kunciFormulir(res.rsvp); }
       }
       selesai();
     };
@@ -885,16 +864,17 @@ button{font:inherit;color:inherit;cursor:pointer}
   var cover    = $('#cover');
   var blackout = $('#blackout');
   $('#openBtn').addEventListener('click', function(){
-    if(!siapPakai) return;             
-    playMusic();                       
+    if(!siapPakai) return;             // tombol memang terkunci; jaga-jaga saja
+    playMusic();                       // dipanggil di dalam gestur tamu
     cover.classList.add('is-open');
-    blackout.classList.add('is-on');   
+    blackout.classList.add('is-on');   // 700ms menuju gelap total
 
     setTimeout(function(){
       cover.classList.add('is-gone');
       document.body.classList.remove('is-locked');
       window.scrollTo(0,0);
       $('#fab').hidden = false;
+      // satu frame jeda supaya layout undangan mapan sebelum disingkap
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){ blackout.classList.remove('is-on'); });
       });
@@ -971,9 +951,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     $('#fieldJumlah').style.display = (e.target.value === 'Tidak Hadir') ? 'none' : 'block';
   });
 
-  var btnSend    = $('#sendWish');
-  var note       = $('#wishNote');
-  var TEKS_KIRIM = 'Kirim Konfirmasi';
+  var btnSend = $('#sendWish');
+  var note    = $('#wishNote');
 
   function tulisNote(teks, kelas){
     note.className = 'hint' + (kelas ? ' ' + kelas : '');
@@ -999,7 +978,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       kode: KODE,
       sumber: UNDANGAN,
       token: CONFIG.rsvpToken,
-      hp: $('#gSite').value,                        
+      hp: $('#gSite').value,                       
       dwell: Math.round((Date.now() - MULAI)/1000)  
     };
 
@@ -1007,48 +986,40 @@ button{font:inherit;color:inherit;cursor:pointer}
       var kini  = (res && res.tercatat) ? res.tercatat : status;
       var orang = (res && typeof res.dicatat === 'number') ? res.dicatat : jumlah;
 
-      var awal = '';
-      if(res && res.diperbarui && res.sebelumnya && res.sebelumnya.kehadiran){
-        var sb = res.sebelumnya;
-        awal = 'Sebelumnya Anda mengonfirmasi ' + sb.kehadiran +
-               (sb.jumlah ? ' untuk ' + sb.jumlah + ' orang' : '') + '. ';
+      if(res && res.terkunci){
+        return 'Konfirmasi Anda sudah tercatat sebelumnya: ' + kini +
+               (orang ? ' untuk ' + orang + ' orang' : '') +
+               '. Bila ada perubahan, mohon hubungi kami langsung.';
       }
-
       if(kini === 'Tidak Hadir'){
-        return awal + 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
+        return 'Terima kasih atas kabarnya. Doa Anda tetap sangat berarti bagi kami.';
       }
       if(res && res.status === 'penuh'){
-        return awal + 'Mohon maaf, kuota resepsi sudah terpenuhi. Nama Anda kami masukkan ke daftar tunggu dan akan kami hubungi bila ada kursi yang tersedia.';
+        return 'Mohon maaf, kuota resepsi sudah terpenuhi. Nama Anda kami masukkan ke daftar tunggu dan akan kami hubungi bila ada kursi yang tersedia.';
       }
       if(res && res.status === 'sebagian'){
-        return awal + 'Kursi yang tersisa tinggal ' + orang + '. Konfirmasi Anda kami catat untuk jumlah tersebut.';
-      }
-      if(res && res.diperbarui){
-        return awal + 'Konfirmasi Anda kini diperbarui menjadi ' + kini +
-               (orang ? ' untuk ' + orang + ' orang' : '') + '. Sampai jumpa di hari bahagia!';
+        return 'Kursi yang tersisa tinggal ' + orang + '. Konfirmasi Anda kami catat untuk jumlah tersebut — silakan hubungi kami langsung bila perlu tambahan.';
       }
       return 'Terima kasih, konfirmasi Anda kami terima: ' + kini +
              (orang ? ' untuk ' + orang + ' orang' : '') + '. Sampai jumpa di hari bahagia!';
     }
 
     function selesai(res){
-      btnSend.disabled = false;
-      btnSend.textContent = TEKS_KIRIM;
+      if(btnSend) btnSend.disabled = false;
+      if(btnSend) btnSend.textContent = 'Kirim Konfirmasi';
 
       if(res === false){
         tulisNote('Maaf, pengiriman gagal. Mohon periksa koneksi lalu coba lagi.', 'hint--warn');
         return;
       }
       if(pesan){ wishes.unshift({ n:nama, s:status, m:pesan }); renderWishes(); }
-      $('#gMsg').value = '';
 
-      SUDAH = {
+      var pesanAkhir = kalimat(res);
+      kunciFormulir({
         kehadiran: (res && res.tercatat) ? res.tercatat : status,
         jumlah   : (res && typeof res.dicatat === 'number') ? res.dicatat : jumlah
-      };
-      TEKS_KIRIM = 'Perbarui Konfirmasi';
-      btnSend.textContent = TEKS_KIRIM;
-      tulisNote(kalimat(res), (res && res.status === 'penuh') ? 'hint--warn' : 'hint--ok');
+      });
+      tulisNote(pesanAkhir, (res && res.status === 'penuh') ? 'hint--warn' : 'hint--ok');
     }
 
     if(!CONFIG.rsvpEndpoint){ selesai(null); return; }
@@ -1069,49 +1040,12 @@ button{font:inherit;color:inherit;cursor:pointer}
     });
   }
 
-
-  var konfirm = $('#konfirm');
-
-  function tutupKonfirm(){
-    konfirm.classList.remove('is-in');
-    document.body.classList.remove('is-locked');
-    setTimeout(function(){ konfirm.classList.remove('is-open'); }, 300);
-  }
-
-  $$('[data-konfirm-batal]').forEach(function(el){
-    el.addEventListener('click', tutupKonfirm);
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && konfirm.classList.contains('is-open')){ tutupKonfirm(); }
-  });
-  $('#kfLanjut').addEventListener('click', function(){
-    tutupKonfirm();
-    kirimRsvp();
-  });
-
   btnSend.addEventListener('click', function(){
-    var nama = $('#gName').value.trim();
-    if(!nama){ tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return; }
-
-    if(!SUDAH || !SUDAH.kehadiran){ kirimRsvp(); return; }
-
-    var st  = $('#gAttend').value;
-    var jml = (st === 'Tidak Hadir') ? 0 : parseInt($('#gCount').value, 10);
-
-    function ringkas(k, n){ return k + (n ? ' · ' + n + ' orang' : ''); }
-
-    $('#kfLama').textContent = ringkas(SUDAH.kehadiran, SUDAH.jumlah);
-    $('#kfBaru').textContent = ringkas(st, jml);
-
-    var sama = (st === SUDAH.kehadiran && jml === SUDAH.jumlah);
-    $('#kfCatatan').textContent = sama
-      ? 'Pilihan Anda masih sama dengan yang tersimpan sebelumnya.'
-      : 'Total yang kami siapkan untuk Anda menjadi ' +
-        jml + ' orang.';
-
-    konfirm.classList.add('is-open');
-    requestAnimationFrame(function(){ konfirm.classList.add('is-in'); });
-    document.body.classList.add('is-locked');
+    if(SUDAH){ return; }                
+    if(!$('#gName').value.trim()){
+      tulisNote('Mohon isi nama terlebih dahulu.', 'hint--warn'); return;
+    }
+    kirimRsvp();
   });
 
   /* ---------- Wedding gift ---------- */
@@ -1174,8 +1108,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(audio.paused){ playMusic(); } else { audio.pause(); }
   });
 
-  /* Video galeri: berputar sendiri tanpa suara saat terlihat di layar,
-     berhenti saat keluar layar. Berkasnya baru diunduh ketika dibutuhkan. */
   var video    = $('#galeriVideo');
   var vidSound = $('#vidSound');
 
@@ -1199,6 +1131,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       mainkanVideo();
     }
 
+    /* Tombol suara. Video bersuara -> musik latar berhenti,
+       lalu lanjut lagi begitu video dibisukan kembali. */
     if(vidSound){
       vidSound.addEventListener('click', function(){
         video.muted = !video.muted;
